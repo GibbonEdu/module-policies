@@ -1,0 +1,10 @@
+CHANGELOG
+=========
+v1.0.01
+-------
+Adjusted policy view to show all a user's roles, not just the current role
+
+v1.0.00
+-------
+Ability to create policy with designated audience
+Ability to view policies
