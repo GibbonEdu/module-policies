@@ -1,6 +1,6 @@
 module-policies
 ===============
-Requires Core v6.0.00 or greater
+Requires Core v7.0.00 or greater
 
 
 INSTALL/UPGRADE

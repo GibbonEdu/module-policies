@@ -70,7 +70,7 @@ else {
 			print "</h3>" ;
 			?>
 			<form method="get" action="<? print $_SESSION[$guid]["absoluteURL"]?>/index.php">
-				<table style="width: 100%">	
+				<table class='smallIntBorder' cellspacing='0' style="width: 100%">	
 					<tr>
 						<td> 
 							<b>All Policies</b><br/>
@@ -162,7 +162,7 @@ else {
 				
 					$count=0;
 					$rowNum="odd" ;
-					print "<table style='width: 100%'>" ;
+					print "<table cellspacing='0' style='width: 100%'>" ;
 					print "<tr class='head'>" ;
 						print "<th style='width: 200px'>" ;
 							print "Name<br/><span style='font-style: italic; font-size: 85%'>Short Name</span>" ;

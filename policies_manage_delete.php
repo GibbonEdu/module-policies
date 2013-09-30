@@ -89,7 +89,7 @@ else {
 			}
 			?>
 			<form method="post" action="<? print $_SESSION[$guid]["absoluteURL"] . "/modules/Policies/policies_manage_deleteProcess.php?policiesPolicyID=$policiesPolicyID&search=" . $_GET["search"] ?>">
-				<table style="width: 100%">	
+				<table class='smallIntBorder' cellspacing='0' style="width: 100%">	
 					<tr>
 						<td> 
 							<b>Are you sure you want to delete "<? print $row["name"] ?>" from Policies?</b><br/>
