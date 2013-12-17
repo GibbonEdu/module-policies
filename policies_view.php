@@ -17,10 +17,10 @@ You should have received a copy of the GNU General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-session_start() ;
+@session_start() ;
 
 //Module includes
-include "./modules/IB PYP/moduleFunctions.php" ;
+include "./modules/Policies/moduleFunctions.php" ;
 
 if (isActionAccessible($guid, $connection2, "/modules/Policies/policies_view.php")==FALSE) {
 	//Acess denied
@@ -40,7 +40,10 @@ else {
 		print "<div class='trailHead'><a href='" . $_SESSION[$guid]["absoluteURL"] . "'>Home</a> > <a href='" . $_SESSION[$guid]["absoluteURL"] . "/index.php?q=/modules/" . getModuleName($_GET["q"]) . "/" . getModuleEntry($_GET["q"], $connection2, $guid) . "'>" . getModuleName($_GET["q"]) . "</a> > </div><div class='trailEnd'>View Policies</div>" ;
 		print "</div>" ;
 		
-		$allPolicies=$_GET["allPolicies"] ;
+		$allPolicies="" ;
+		if (isset($_GET["allPolicies"])) {
+			$allPolicies=$_GET["allPolicies"] ;
+		}
 	
 		//Build role lookup array
 		$allRoles=array() ;
@@ -136,6 +139,7 @@ else {
 		else {
 			$lastHeader="" ;
 			$headerCount=0 ;
+			$count=0 ;
 			while ($row=$result->fetch()) {
 				if ($count%2==0) {
 					$rowNum="even" ;
@@ -228,7 +232,7 @@ else {
 				print "</tr>" ;
 				if ($row["description"]!="") {
 					print "<tr class='comment-$count' id='comment-$count'>" ;
-						print "<td style='background-color: #fff; border-bottom: 1px solid #333' colspan=5>" ;
+						print "<td style='background-color: #fff' colspan=5>" ;
 							print $row["description"] ;
 						print "</td>" ;
 					print "</tr>" ;

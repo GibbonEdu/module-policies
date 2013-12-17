@@ -33,7 +33,7 @@ catch(PDOException $e) {
 }
 
 
-session_start() ;
+@session_start() ;
 
 //Set timezone from session variable
 date_default_timezone_set($_SESSION[$guid]["timezone"]);
@@ -42,15 +42,15 @@ $URL=$_SESSION[$guid]["absoluteURL"] . "/index.php?q=/modules/" . getModuleName(
 
 if (isActionAccessible($guid, $connection2, "/modules/Policies/policies_manage_add.php")==FALSE) {
 	//Fail 0
-	$URL = $URL . "&addReturn=fail0" ;
+	$URL=$URL . "&addReturn=fail0" ;
 	header("Location: {$URL}");
 }
 else {
 	//Proceed!
 	$scope=$_POST["scope"] ;
-	$gibbonDepartmentID=$_POST["gibbonDepartmentID"] ;
-	if ($gibbonDepartmentID=="") {
-		$gibbonDepartmentID=NULL ;
+	$gibbonDepartmentID=NULL ;
+	if (isset($_POST["gibbonDepartmentID"])) {
+		$gibbonDepartmentID=$_POST["gibbonDepartmentID"] ;
 	}
 	$name=$_POST["name"] ;
 	$nameShort=$_POST["nameShort"] ;
@@ -61,8 +61,10 @@ else {
 	$link=$_POST["link"] ;
 	$gibbonRoleIDList="" ;
 	for ($i=0; $i<$_POST["roleCount"]; $i++) {
-		if ($_POST["gibbonRoleID" . $i]!="") {
-			$gibbonRoleIDList.=$_POST["gibbonRoleID" . $i] . "," ;
+		if (isset($_POST["gibbonRoleID" . $i])) {
+			if ($_POST["gibbonRoleID" . $i]!="") {
+				$gibbonRoleIDList.=$_POST["gibbonRoleID" . $i] . "," ;
+			}
 		}
 	}
 	if (substr($gibbonRoleIDList, -1)==",") {
@@ -71,7 +73,7 @@ else {
 	
 	if ($scope=="" OR ($scope=="Department" AND is_null($gibbonDepartmentID)) OR $name=="" OR $nameShort=="" OR $active=="" OR $type=="" OR ($type=="Link" AND $link=="")) {
 		//Fail 3
-		$URL = $URL . "&addReturn=fail3" ;
+		$URL=$URL . "&addReturn=fail3" ;
 		header("Location: {$URL}");
 	}
 	else {
@@ -114,7 +116,7 @@ else {
 				
 					if (!(move_uploaded_file($_FILES["file"]["tmp_name"],$path . "/" . $location))) {
 						//Fail 5
-						$URL = $URL . "&addReturn=fail5" ;
+						$URL=$URL . "&addReturn=fail5" ;
 						header("Location: {$URL}");
 					}
 				}
@@ -126,7 +128,7 @@ else {
 		
 		if ($partialFail==TRUE) {
 			//Fail 5
-			$URL = $URL . "&addReturn=fail5" ;
+			$URL=$URL . "&addReturn=fail5" ;
 			header("Location: {$URL}");
 			break ;
 		}
@@ -140,13 +142,13 @@ else {
 			}
 			catch(PDOException $e) {
 				//Fail 2
-				$URL = $URL . "&addReturn=fail2" ;
+				$URL=$URL . "&addReturn=fail2" ;
 				header("Location: {$URL}");
 				break ;
 			}
 
 			//Success 0
-			$URL = $URL . "&addReturn=success0" ;
+			$URL=$URL . "&addReturn=success0" ;
 			header("Location: {$URL}");
 		}
 	}

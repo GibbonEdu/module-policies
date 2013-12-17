@@ -17,10 +17,10 @@ You should have received a copy of the GNU General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-session_start() ;
+@session_start() ;
 
 //Module includes
-include "./modules/IB PYP/moduleFunctions.php" ;
+include "./modules/Policies/moduleFunctions.php" ;
 
 if (isActionAccessible($guid, $connection2, "/modules/Policies/policies_manage.php")==FALSE) {
 
@@ -34,7 +34,7 @@ else {
 	print "<div class='trailHead'><a href='" . $_SESSION[$guid]["absoluteURL"] . "'>Home</a> > <a href='" . $_SESSION[$guid]["absoluteURL"] . "/index.php?q=/modules/" . getModuleName($_GET["q"]) . "/" . getModuleEntry($_GET["q"], $connection2, $guid) . "'>" . getModuleName($_GET["q"]) . "</a> > </div><div class='trailEnd'>Manage Policies</div>" ;
 	print "</div>" ;
 	
-	$deleteReturn = $_GET["deleteReturn"] ;
+	if (isset($_GET["deleteReturn"])) { $deleteReturn=$_GET["deleteReturn"] ; } else { $deleteReturn="" ; }
 	$deleteReturnMessage ="" ;
 	$class="error" ;
 	if (!($deleteReturn=="")) {
@@ -48,7 +48,10 @@ else {
 	}
 	
 	//Set pagination variable
-	$page=$_GET["page"] ;
+	$page=NULL ;
+	if (isset($_GET["page"])) {
+		$page=$_GET["page"] ;
+	}
 	if ((!is_numeric($page)) OR $page<1) {
 		$page=1 ;
 	}
@@ -66,6 +69,11 @@ else {
 		$allRoles[$rowRoles["gibbonRoleID"]]=$rowRoles["name"] ;
 	}
 	
+	$search=NULL ;
+	if (isset($_GET["search"])) {
+		$search=$_GET["search"] ;
+	}
+	
 	print "<h2 class='top'>" ;
 	print "Search" ;
 	print "</h2>" ;
@@ -78,7 +86,7 @@ else {
 					<span style="font-size: 90%"><i>Name, Short Name, Category, Department.</i></span>
 				</td>
 				<td class="right">
-					<input name="search" id="search" maxlength=20 value="<? print $_GET["search"] ?>" type="text" style="width: 300px">
+					<input name="search" id="search" maxlength=20 value="<? print $search ?>" type="text" style="width: 300px">
 				</td>
 			</tr>
 			<tr>
@@ -99,8 +107,6 @@ else {
 	print "View" ;
 	print "</h2>" ;
 	
-	$search=$_GET["search"] ;
-	
 	try {
 		$data=array();  
 		$sql="SELECT policiesPolicy.*, gibbonDepartment.name AS department FROM policiesPolicy LEFT JOIN gibbonDepartment ON (policiesPolicy.gibbonDepartmentID=gibbonDepartment.gibbonDepartmentID) ORDER BY scope, gibbonDepartment.name, category, policiesPolicy.name" ; 
@@ -117,7 +123,7 @@ else {
 	}
 	
 	print "<div class='linkTop'>" ;
-	print "<a href='" . $_SESSION[$guid]["absoluteURL"] . "/index.php?q=/modules/Policies/policies_manage_add.php&search=" . $_GET["search"] . "'><img title='New' src='./themes/" . $_SESSION[$guid]["gibbonThemeName"] . "/img/page_new.gif'/></a>" ;
+	print "<a href='" . $_SESSION[$guid]["absoluteURL"] . "/index.php?q=/modules/Policies/policies_manage_add.php&search=$search'><img title='New' src='./themes/" . $_SESSION[$guid]["gibbonThemeName"] . "/img/page_new.gif'/></a>" ;
 	print "</div>" ;
 		
 	if ($result->rowCount()<1) {
@@ -210,8 +216,8 @@ else {
 								print "});" ;
 							print "});" ;
 						print "</script>" ;
-						print "<a href='" . $_SESSION[$guid]["absoluteURL"] . "/index.php?q=/modules/Policies/policies_manage_edit.php&policiesPolicyID=" . $row["policiesPolicyID"] . "&search=" . $_GET["search"] . "'><img title='Edit' src='./themes/" . $_SESSION[$guid]["gibbonThemeName"] . "/img/config.png'/></a> " ;
-						print "<a href='" . $_SESSION[$guid]["absoluteURL"] . "/index.php?q=/modules/Policies/policies_manage_delete.php&policiesPolicyID=" . $row["policiesPolicyID"] . "&search=" . $_GET["search"] . "'><img title='Delete' src='./themes/" . $_SESSION[$guid]["gibbonThemeName"] . "/img/garbage.png'/></a> " ;
+						print "<a href='" . $_SESSION[$guid]["absoluteURL"] . "/index.php?q=/modules/Policies/policies_manage_edit.php&policiesPolicyID=" . $row["policiesPolicyID"] . "&search=$search'><img title='Edit' src='./themes/" . $_SESSION[$guid]["gibbonThemeName"] . "/img/config.png'/></a> " ;
+						print "<a href='" . $_SESSION[$guid]["absoluteURL"] . "/index.php?q=/modules/Policies/policies_manage_delete.php&policiesPolicyID=" . $row["policiesPolicyID"] . "&search=$search'><img title='Delete' src='./themes/" . $_SESSION[$guid]["gibbonThemeName"] . "/img/garbage.png'/></a> " ;
 						if ($row["description"]!="") {
 							print "<a class='show_hide-$count' onclick='false' href='#'><img style='padding-right: 5px' src='" . $_SESSION[$guid]["absoluteURL"] . "/themes/Default/img/page_down.png' title='Show Description' onclick='return false;' /></a>" ;
 						}
@@ -219,7 +225,7 @@ else {
 				print "</tr>" ;
 				if ($row["description"]!="") {
 					print "<tr class='comment-$count' id='comment-$count'>" ;
-						print "<td style='background-color: #fff; border-bottom: 1px solid #333' colspan=5>" ;
+						print "<td style='background-color: #fff' colspan=5>" ;
 							print $row["description"] ;
 						print "</td>" ;
 					print "</tr>" ;

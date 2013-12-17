@@ -17,10 +17,10 @@ You should have received a copy of the GNU General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-session_start() ;
+@session_start() ;
 
 //Module includes
-include "./modules/IB PYP/moduleFunctions.php" ;
+include "./modules/Policies/moduleFunctions.php" ;
 
 if (isActionAccessible($guid, $connection2, "/modules/Policies/policies_manage_add.php")==FALSE) {
 	//Acess denied
@@ -33,7 +33,7 @@ else {
 	print "<div class='trailHead'><a href='" . $_SESSION[$guid]["absoluteURL"] . "'>Home</a> > <a href='" . $_SESSION[$guid]["absoluteURL"] . "/index.php?q=/modules/" . getModuleName($_GET["q"]) . "/" . getModuleEntry($_GET["q"], $connection2, $guid) . "'>" . getModuleName($_GET["q"]) . "</a> > <a href='" . $_SESSION[$guid]["absoluteURL"] . "/index.php?q=/modules/" . getModuleName($_GET["q"]) . "/policies_manage.php'>Manage Policies</a> > </div><div class='trailEnd'>Add Policy</div>" ;
 	print "</div>" ;
 	
-	$addReturn = $_GET["addReturn"] ;
+	if (isset($_GET["addReturn"])) { $addReturn=$_GET["addReturn"] ; } else { $addReturn="" ; }
 	$addReturnMessage ="" ;
 	$class="error" ;
 	if (!($addReturn=="")) {
@@ -82,7 +82,7 @@ else {
 						<option value="Department">Department</option>
 					</select>
 					<script type="text/javascript">
-						var scope = new LiveValidation('scope');
+						var scope=new LiveValidation('scope');
 						scope.add(Validate.Exclusion, { within: ['Please select...'], failureMessage: "Select something!"});
 					 </script>
 				</td>
@@ -128,7 +128,7 @@ else {
 						?>
 					</select>
 					<script type="text/javascript">
-						var gibbonDepartmentID = new LiveValidation('gibbonDepartmentID');
+						var gibbonDepartmentID=new LiveValidation('gibbonDepartmentID');
 						gibbonDepartmentID.add(Validate.Exclusion, { within: ['Please select...'], failureMessage: "Select something!"});
 					</script>
 				</td>
@@ -140,7 +140,7 @@ else {
 				<td class="right">
 					<input name="name" id="name" maxlength=100 value="" type="text" style="width: 300px">
 					<script type="text/javascript">
-						var name = new LiveValidation('name');
+						var name=new LiveValidation('name');
 						name.add(Validate.Presence);
 					</script>
 				</td>
@@ -152,7 +152,7 @@ else {
 				<td class="right">
 					<input name="nameShort" id="nameShort" maxlength=14 value="" type="text" style="width: 300px">
 					<script type="text/javascript">
-						var nameShort = new LiveValidation('nameShort');
+						var nameShort=new LiveValidation('nameShort');
 						nameShort.add(Validate.Presence);
 					</script>
 				</td>
@@ -177,7 +177,7 @@ else {
 					<input name="category" id="category" maxlength=50 value="" type="text" style="width: 300px">
 					<script type="text/javascript">
 						$(function() {
-							var availableTags = [
+							var availableTags=[
 								<?
 								try {
 									$dataAuto=array();  
@@ -210,44 +210,16 @@ else {
 					<b>Type *</b><br/>
 				</td>
 				<td class="right">
-					<?
-					if ($row["homeworkSubmissionType"]=="Link") {
-						print "<input readonly id='type' name='type' type='text' value='Link' style='width: 302px'>" ;
-					}
-					else if ($row["homeworkSubmissionType"]=="File") {
-						print "<input readonly id='type' name='type' type='text' value='File' style='width: 302px'>" ;
-						}
-					else {
-						?>
-						<input checked type="radio" id="type" name="type" class="type" value="Link" /> Link
-						<input type="radio" id="type" name="type" class="type" value="File" /> File
-						<?
-					}
-					?>
+					<input checked type="radio" id="type" name="type" class="type" value="Link" /> Link
+					<input type="radio" id="type" name="type" class="type" value="File" /> File
 				</td>
 			</tr>
 			<script type="text/javascript">
 				/* Subbmission type control */
-				$(document).ready(function(){
-					<?
-					if ($row["homeworkSubmissionType"]=="Link") {
-						?>
-						$("#fileRow").css("display","none");
-						<?
-					}
-					else if ($row["homeworkSubmissionType"]=="File") {
-						?>
-						$("#linkRow").css("display","none");
-						<?
-					}
-					else {
-						?>
-						$("#fileRow").css("display","none");
-						$("#linkRow").slideDown("fast", $("#linkRow").css("display","table-row")); //Slide Down Effect
-						<?
-					}
-					?>
-					
+				$(document).ready(function() {
+					$("#fileRow").css("display","none");
+					$("#linkRow").slideDown("fast", $("#linkRow").css("display","table-row")); //Slide Down Effect
+						
 					$(".type").click(function(){
 						if ($('input[name=type]:checked').val() == "Link" ) {
 							$("#fileRow").css("display","none");
@@ -283,7 +255,7 @@ else {
 					}
 					?>
 					<script type="text/javascript">
-						var file = new LiveValidation('file');
+						var file=new LiveValidation('file');
 						file.add( Validate.Inclusion, { within: [<? print $ext ;?>], failureMessage: "Illegal file type!", partialMatch: true, caseSensitive: false } );
 					</script>
 				</td>
@@ -295,7 +267,7 @@ else {
 				<td class="right">
 					<input name="link" id="link" maxlength=255 value="" type="text" style="width: 300px">
 					<script type="text/javascript">
-						var link = new LiveValidation('link');
+						var link=new LiveValidation('link');
 						link.add( Validate.Inclusion, { within: ['http://', 'https://'], failureMessage: "Address must start with http:// or https://", partialMatch: true } );
 					</script>
 				</td>
