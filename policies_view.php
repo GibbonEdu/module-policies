@@ -1,4 +1,4 @@
-<?
+<?php
 /*
 Gibbon, Flexible & Open School System
 Copyright (C) 2010, Ross Parker
@@ -72,7 +72,7 @@ else {
 			print "Filters" ;
 			print "</h3>" ;
 			?>
-			<form method="get" action="<? print $_SESSION[$guid]["absoluteURL"]?>/index.php">
+			<form method="get" action="<?php print $_SESSION[$guid]["absoluteURL"]?>/index.php">
 				<table class='smallIntBorder' cellspacing='0' style="width: 100%">	
 					<tr>
 						<td> 
@@ -80,7 +80,7 @@ else {
 							<span style="font-size: 90%"><i>Override audience to reveal all policies.</i></span>
 						</td>
 						<td class="right">
-							<?
+							<?php
 							$checked="" ;
 							if ($allPolicies=="on") {
 								$checked="checked" ;
@@ -91,14 +91,14 @@ else {
 					</tr>
 					<tr>
 						<td colspan=2 class="right">
-							<input type="hidden" name="q" value="/modules/<? print $_SESSION[$guid]["module"] ?>/policies_view.php">
-							<input type="hidden" name="address" value="<? print $_SESSION[$guid]["address"] ?>">
+							<input type="hidden" name="q" value="/modules/<?php print $_SESSION[$guid]["module"] ?>/policies_view.php">
+							<input type="hidden" name="address" value="<?php print $_SESSION[$guid]["address"] ?>">
 							<input type="submit" value="Submit">
 						</td>
 					</tr>
 				</table>
 			</form>
-			<?
+			<?php
 		}
 	
 		try {

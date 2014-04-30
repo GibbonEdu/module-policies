@@ -1,5 +1,9 @@
 CHANGELOG
 =========
+v1.0.06
+-------
+Fixed PHP short tag issues
+
 v1.0.05
 -------
 Fixed PHP Notice issues

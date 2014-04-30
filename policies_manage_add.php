@@ -1,4 +1,4 @@
-<?
+<?php
 /*
 Gibbon, Flexible & Open School System
 Copyright (C) 2010, Ross Parker
@@ -68,7 +68,7 @@ else {
 	}
 	
 	?>
-	<form method="post" action="<? print $_SESSION[$guid]["absoluteURL"] . "/modules/Policies/policies_manage_addProcess.php?search=" . $_GET["search"] ?>" enctype="multipart/form-data">
+	<form method="post" action="<?php print $_SESSION[$guid]["absoluteURL"] . "/modules/Policies/policies_manage_addProcess.php?search=" . $_GET["search"] ?>" enctype="multipart/form-data">
 		<table class='smallIntBorder' cellspacing='0' style="width: 100%">	
 			<tr>
 				<td> 
@@ -110,7 +110,7 @@ else {
 					<span style="font-size: 90%"><i></i></span>
 				</td>
 				<td class="right">
-					<?
+					<?php
 					try {
 						$dataSelect=array(); 
 						$sqlSelect="SELECT * FROM gibbonDepartment ORDER BY name" ;
@@ -121,7 +121,7 @@ else {
 					?>
 					<select name="gibbonDepartmentID" id="gibbonDepartmentID" style="width: 302px">
 						<option value="Please select...">Please select...</option>
-						<?
+						<?php
 						while ($rowSelect=$resultSelect->fetch()) {
 							print "<option value='" . $rowSelect["gibbonDepartmentID"] . "'>" . $rowSelect["name"] . "</option>" ;
 						}
@@ -178,7 +178,7 @@ else {
 					<script type="text/javascript">
 						$(function() {
 							var availableTags=[
-								<?
+								<?php
 								try {
 									$dataAuto=array();  
 									$sqlAuto="SELECT DISTINCT category FROM policiesPolicy ORDER BY category" ;
@@ -238,7 +238,7 @@ else {
 				</td>
 				<td class="right">
 					<input type="file" name="file" id="file"><br/><br/>
-					<?
+					<?php
 					print getMaxUpload() ;
 					
 					//Get list of acceptable file extensions
@@ -256,7 +256,7 @@ else {
 					?>
 					<script type="text/javascript">
 						var file=new LiveValidation('file');
-						file.add( Validate.Inclusion, { within: [<? print $ext ;?>], failureMessage: "Illegal file type!", partialMatch: true, caseSensitive: false } );
+						file.add( Validate.Inclusion, { within: [<?php print $ext ;?>], failureMessage: "Illegal file type!", partialMatch: true, caseSensitive: false } );
 					</script>
 				</td>
 			</tr>
@@ -278,7 +278,7 @@ else {
 					<span style="font-size: 90%"><i>User role groups who should have view access.<br/></i></span>
 				</td>
 				<td class="right">
-					<? 
+					<?php 
 					$roleCount=0 ;
 					try {
 						$dataRoles=array();  
@@ -292,7 +292,7 @@ else {
 						$roleCount++ ;
 					}
 					?>
-					<input type="hidden" name="roleCount" value="<? print $roleCount ?>">
+					<input type="hidden" name="roleCount" value="<?php print $roleCount ?>">
 				</td>
 			</tr>
 															
@@ -302,12 +302,12 @@ else {
 					<span style="font-size: 90%"><i>* denotes a required field</i></span>
 				</td>
 				<td class="right">
-					<input type="hidden" name="address" value="<? print $_SESSION[$guid]["address"] ?>">
+					<input type="hidden" name="address" value="<?php print $_SESSION[$guid]["address"] ?>">
 					<input type="submit" value="Submit">
 				</td>
 			</tr>
 		</table>
 	</form>
-	<?
+	<?php
 }
 ?>

@@ -1,4 +1,4 @@
-<?
+<?php
 /*
 Gibbon, Flexible & Open School System
 Copyright (C) 2010, Ross Parker
@@ -99,7 +99,7 @@ else {
 				print "</div>" ;
 			}
 			?>
-			<form method="post" action="<? print $_SESSION[$guid]["absoluteURL"] . "/modules/Policies/policies_manage_editProcess.php?policiesPolicyID=$policiesPolicyID&search=" . $_GET["search"] ?>" enctype="multipart/form-data">
+			<form method="post" action="<?php print $_SESSION[$guid]["absoluteURL"] . "/modules/Policies/policies_manage_editProcess.php?policiesPolicyID=$policiesPolicyID&search=" . $_GET["search"] ?>" enctype="multipart/form-data">
 				<table class='smallIntBorder' cellspacing='0' style="width: 100%">	
 					<tr>
 						<td> 
@@ -107,11 +107,11 @@ else {
 							<span style="font-size: 90%"><i>This value cannot be changed</i></span>
 						</td>
 						<td class="right">
-							<input readonly name="scope" id="scope" value="<? print $row["scope"] ?>" type="text" style="width: 300px">
+							<input readonly name="scope" id="scope" value="<?php print $row["scope"] ?>" type="text" style="width: 300px">
 						</td>
 					</tr>
 					
-					<?
+					<?php
 					if ($row["scope"]=="Department") {
 						?>
 						<tr id='learningAreaRow'>
@@ -120,7 +120,7 @@ else {
 								<span style="font-size: 90%"><i>This value cannot be changed</i></span>
 							</td>
 							<td class="right">
-								<?
+								<?php
 								try {
 									$dataSelect=array("gibbonDepartmentID"=>$row["gibbonDepartmentID"]); 
 									$sqlSelect="SELECT * FROM gibbonDepartment WHERE gibbonDepartmentID=:gibbonDepartmentID" ;
@@ -139,7 +139,7 @@ else {
 								}
 								?>
 						</tr>
-						<?
+						<?php
 					}
 					?>
 					<tr>
@@ -147,7 +147,7 @@ else {
 							<b>Name *</b><br/>
 						</td>
 						<td class="right">
-							<input name="name" id="name" maxlength=100 value="<? print htmlPrep($row["name"]) ?>" type="text" style="width: 300px">
+							<input name="name" id="name" maxlength=100 value="<?php print htmlPrep($row["name"]) ?>" type="text" style="width: 300px">
 							<script type="text/javascript">
 								var name=new LiveValidation('name');
 								name.add(Validate.Presence);
@@ -159,7 +159,7 @@ else {
 							<b>Name Short *</b><br/>
 						</td>
 						<td class="right">
-							<input name="nameShort" id="nameShort" maxlength=14 value="<? print htmlPrep($row["nameShort"]) ?>" type="text" style="width: 300px">
+							<input name="nameShort" id="nameShort" maxlength=14 value="<?php print htmlPrep($row["nameShort"]) ?>" type="text" style="width: 300px">
 							<script type="text/javascript">
 								var nameShort=new LiveValidation('nameShort');
 								nameShort.add(Validate.Presence);
@@ -173,8 +173,8 @@ else {
 						</td>
 						<td class="right">
 							<select name="active" id="active" style="width: 302px">
-								<option <? if ($row["active"]=="Y") { print "selected" ; } ?> value="Y">Y</option>
-								<option <? if ($row["active"]=="N") { print "selected" ; } ?> value="N">N</option>
+								<option <?php if ($row["active"]=="Y") { print "selected" ; } ?> value="Y">Y</option>
+								<option <?php if ($row["active"]=="N") { print "selected" ; } ?> value="N">N</option>
 							</select>
 						</td>
 					</tr>
@@ -183,11 +183,11 @@ else {
 							<b>Category</b><br/>
 						</td>
 						<td class="right">
-							<input name="category" id="category" maxlength=50 value="<? print htmlPrep($row["category"]) ?>" type="text" style="width: 300px">
+							<input name="category" id="category" maxlength=50 value="<?php print htmlPrep($row["category"]) ?>" type="text" style="width: 300px">
 							<script type="text/javascript">
 								$(function() {
 									var availableTags=[
-										<?
+										<?php
 										try {
 											$dataAuto=array();  
 											$sqlAuto="SELECT DISTINCT category FROM policiesPolicy ORDER BY category" ;
@@ -211,7 +211,7 @@ else {
 							<b>Description</b><br/>
 						</td>
 						<td class="right">
-							<textarea name='description' id='description' rows=5 style='width: 300px'><? print htmlPrep($row["description"]) ?></textarea>
+							<textarea name='description' id='description' rows=5 style='width: 300px'><?php print htmlPrep($row["description"]) ?></textarea>
 						</td>
 					</tr>
 					<tr>
@@ -220,7 +220,7 @@ else {
 							<span style="font-size: 90%"><i>This value cannot be changed</i></span>
 						</td>
 						<td class="right">
-							<input readonly name="type" id="type" value="<? print $row["type"] ?>" type="text" style="width: 300px">
+							<input readonly name="type" id="type" value="<?php print $row["type"] ?>" type="text" style="width: 300px">
 						</td>
 					</tr>
 					<tr>
@@ -230,7 +230,7 @@ else {
 						</td>
 						<td class="right">
 							<div style='text-align: left ;float: right; width: 300px;'>
-							<?
+							<?php
 							if ($row["type"]=="File") {
 								print "<a style='font-weight: bold' href='" . $_SESSION[$guid]["absoluteURL"] . "/" . $row["location"] ."'>" . $_SESSION[$guid]["absoluteURL"] . "/" . $row["location"] . "</a><br/>" ;
 							}
@@ -247,7 +247,7 @@ else {
 							<span style="font-size: 90%"><i>User role groups who should have view access.<br/></i></span>
 						</td>
 						<td class="right">
-							<? 
+							<?php 
 							$roleCount=0 ;
 							try {
 								$dataRoles=array();  
@@ -265,7 +265,7 @@ else {
 								$roleCount++ ;
 							}
 							?>
-							<input type="hidden" name="roleCount" value="<? print $roleCount ?>">
+							<input type="hidden" name="roleCount" value="<?php print $roleCount ?>">
 						</td>
 					</tr>
 			
@@ -274,13 +274,13 @@ else {
 							<span style="font-size: 90%"><i>* denotes a required field</i></span>
 						</td>
 						<td class="right">
-							<input type="hidden" name="address" value="<? print $_SESSION[$guid]["address"] ?>">
+							<input type="hidden" name="address" value="<?php print $_SESSION[$guid]["address"] ?>">
 							<input type="submit" value="Submit">
 						</td>
 					</tr>
 				</table>
 			</form>
-			<?
+			<?php
 		}
 	}
 }
