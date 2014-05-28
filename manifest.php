@@ -25,7 +25,7 @@ $description="A place to store, share and view school policies, either as files 
 $entryURL="policies_view.php" ;
 $type="Additional" ;
 $category="Other" ;
-$version="1.0.06" ;
+$version="1.0.07" ;
 $author="Ross Parker" ;
 $url="http://rossparker.org" ;
 
