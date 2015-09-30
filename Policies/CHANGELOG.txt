@@ -1,5 +1,9 @@
 CHANGELOG
 =========
+v1.0.09
+-------
+Fixed PHP Strict issues
+
 v1.0.08
 -------
 Sub folder tweak

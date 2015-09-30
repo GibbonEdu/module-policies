@@ -84,8 +84,9 @@ else {
 		else {
 			//Check extension to see if allowed
 			try {
-				$dataExt=array("username"=>$username); 
-				$sqlExt="SELECT * FROM gibbonFileExtension WHERE extension='". end(explode(".", $_FILES['file']["name"])) ."'";
+				$ext=explode(".", $_FILES['file']["name"]) ;
+				$dataExt=array("extension"=>end($ext)); 
+				$sqlExt="SELECT * FROM gibbonFileExtension WHERE extension=:extension";
 				$resultExt=$connection2->prepare($sqlExt);
 				$resultExt->execute($dataExt);
 			}
@@ -98,7 +99,7 @@ else {
 			}
 			else {
 				//Attempt file upload
-				$time=mktime() ;
+				$time=time() ;
 				if ($_FILES['file']["tmp_name"]!="") {
 					//Check for folder in uploads based on today's date
 					$path=$_SESSION[$guid]["absolutePath"] ; ;
