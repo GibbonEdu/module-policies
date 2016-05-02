@@ -20,17 +20,17 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 //This file describes the module, including database tables
 
 //Basic variables
-$name="Policies" ;
-$description="A place to store, share and view school policies, either as files or links. Policies can be designated for access by particular audiences." ;
-$entryURL="policies_view.php" ;
-$type="Additional" ;
-$category="Other" ;
-$version="1.0.10" ;
-$author="Ross Parker" ;
-$url="http://rossparker.org" ;
+$name = 'Policies';
+$description = 'A place to store, share and view school policies, either as files or links. Policies can be designated for access by particular audiences.';
+$entryURL = 'policies_view.php';
+$type = 'Additional';
+$category = 'Other';
+$version = '1.0.11';
+$author = 'Ross Parker';
+$url = 'http://rossparker.org';
 
 //Module tables
-$moduleTables[0]="CREATE TABLE `policiesPolicy` (
+$moduleTables[0] = "CREATE TABLE `policiesPolicy` (
   `policiesPolicyID` int(8) unsigned zerofill NOT NULL AUTO_INCREMENT,
   `name` varchar(100) NOT NULL,
   `nameShort` varchar(14) NOT NULL,
@@ -45,57 +45,55 @@ $moduleTables[0]="CREATE TABLE `policiesPolicy` (
   `gibbonPersonIDCreator` int(8) unsigned zerofill NOT NULL,
   `timestampCreated` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
   PRIMARY KEY (`policiesPolicyID`)
-) ENGINE=MyISAM DEFAULT CHARSET=utf8 ;" ;
+) ENGINE=MyISAM DEFAULT CHARSET=utf8 ;";
 
 //Action rows
-$actionRows[0]["name"]="View Policies_byRole" ;
-$actionRows[0]["precedence"]="0";
-$actionRows[0]["category"]="" ;
-$actionRows[0]["description"]="Allows user to view active policies according to their current role." ;
-$actionRows[0]["URLList"]="policies_view.php" ;
-$actionRows[0]["entryURL"]="policies_view.php" ;
-$actionRows[0]["defaultPermissionAdmin"]="N" ;
-$actionRows[0]["defaultPermissionTeacher"]="Y" ;
-$actionRows[0]["defaultPermissionStudent"]="Y" ;
-$actionRows[0]["defaultPermissionParent"]="Y" ;
-$actionRows[0]["defaultPermissionSupport"]="Y" ;
-$actionRows[0]["categoryPermissionStaff"]="Y" ;
-$actionRows[0]["categoryPermissionStudent"]="Y" ;
-$actionRows[0]["categoryPermissionParent"]="Y" ;
-$actionRows[0]["categoryPermissionOther"]="Y" ;
+$actionRows[0]['name'] = 'View Policies_byRole';
+$actionRows[0]['precedence'] = '0';
+$actionRows[0]['category'] = 'Policies';
+$actionRows[0]['description'] = 'Allows user to view active policies according to their current role.';
+$actionRows[0]['URLList'] = 'policies_view.php';
+$actionRows[0]['entryURL'] = 'policies_view.php';
+$actionRows[0]['defaultPermissionAdmin'] = 'N';
+$actionRows[0]['defaultPermissionTeacher'] = 'Y';
+$actionRows[0]['defaultPermissionStudent'] = 'Y';
+$actionRows[0]['defaultPermissionParent'] = 'Y';
+$actionRows[0]['defaultPermissionSupport'] = 'Y';
+$actionRows[0]['categoryPermissionStaff'] = 'Y';
+$actionRows[0]['categoryPermissionStudent'] = 'Y';
+$actionRows[0]['categoryPermissionParent'] = 'Y';
+$actionRows[0]['categoryPermissionOther'] = 'Y';
 
 //Action rows
-$actionRows[1]["name"]="View Policies_all" ;
-$actionRows[1]["precedence"]="1";
-$actionRows[1]["category"]="" ;
-$actionRows[1]["description"]="Allows user to view all active policies." ;
-$actionRows[1]["URLList"]="policies_view.php" ;
-$actionRows[1]["entryURL"]="policies_view.php" ;
-$actionRows[1]["defaultPermissionAdmin"]="Y" ;
-$actionRows[1]["defaultPermissionTeacher"]="N" ;
-$actionRows[1]["defaultPermissionStudent"]="N" ;
-$actionRows[1]["defaultPermissionParent"]="N" ;
-$actionRows[1]["defaultPermissionSupport"]="N" ;
-$actionRows[1]["categoryPermissionStaff"]="Y" ;
-$actionRows[1]["categoryPermissionStudent"]="Y" ;
-$actionRows[1]["categoryPermissionParent"]="Y" ;
-$actionRows[1]["categoryPermissionOther"]="Y" ;
+$actionRows[1]['name'] = 'View Policies_all';
+$actionRows[1]['precedence'] = '1';
+$actionRows[1]['category'] = 'Policies';
+$actionRows[1]['description'] = 'Allows user to view all active policies.';
+$actionRows[1]['URLList'] = 'policies_view.php';
+$actionRows[1]['entryURL'] = 'policies_view.php';
+$actionRows[1]['defaultPermissionAdmin'] = 'Y';
+$actionRows[1]['defaultPermissionTeacher'] = 'N';
+$actionRows[1]['defaultPermissionStudent'] = 'N';
+$actionRows[1]['defaultPermissionParent'] = 'N';
+$actionRows[1]['defaultPermissionSupport'] = 'N';
+$actionRows[1]['categoryPermissionStaff'] = 'Y';
+$actionRows[1]['categoryPermissionStudent'] = 'Y';
+$actionRows[1]['categoryPermissionParent'] = 'Y';
+$actionRows[1]['categoryPermissionOther'] = 'Y';
 
 //Action rows
-$actionRows[2]["name"]="Manage Policies" ;
-$actionRows[2]["precedence"]="0";
-$actionRows[2]["category"]="" ;
-$actionRows[2]["description"]="Allows user to create and edit all policies." ;
-$actionRows[2]["URLList"]="policies_manage.php, policies_manage_add.php, policies_manage_edit.php, policies_manage_delete.php" ;
-$actionRows[2]["entryURL"]="policies_manage.php" ;
-$actionRows[2]["defaultPermissionAdmin"]="Y" ;
-$actionRows[2]["defaultPermissionTeacher"]="N" ;
-$actionRows[2]["defaultPermissionStudent"]="N" ;
-$actionRows[2]["defaultPermissionParent"]="N" ;
-$actionRows[2]["defaultPermissionSupport"]="N" ;
-$actionRows[2]["categoryPermissionStaff"]="Y" ;
-$actionRows[2]["categoryPermissionStudent"]="N" ;
-$actionRows[2]["categoryPermissionParent"]="N" ;
-$actionRows[2]["categoryPermissionOther"]="N" ;
-
-?>
+$actionRows[2]['name'] = 'Manage Policies';
+$actionRows[2]['precedence'] = '0';
+$actionRows[2]['category'] = 'Policies';
+$actionRows[2]['description'] = 'Allows user to create and edit all policies.';
+$actionRows[2]['URLList'] = 'policies_manage.php, policies_manage_add.php, policies_manage_edit.php, policies_manage_delete.php';
+$actionRows[2]['entryURL'] = 'policies_manage.php';
+$actionRows[2]['defaultPermissionAdmin'] = 'Y';
+$actionRows[2]['defaultPermissionTeacher'] = 'N';
+$actionRows[2]['defaultPermissionStudent'] = 'N';
+$actionRows[2]['defaultPermissionParent'] = 'N';
+$actionRows[2]['defaultPermissionSupport'] = 'N';
+$actionRows[2]['categoryPermissionStaff'] = 'Y';
+$actionRows[2]['categoryPermissionStudent'] = 'N';
+$actionRows[2]['categoryPermissionParent'] = 'N';
+$actionRows[2]['categoryPermissionOther'] = 'N';

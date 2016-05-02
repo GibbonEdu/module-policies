@@ -17,62 +17,59 @@ You should have received a copy of the GNU General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-@session_start() ;
+@session_start();
 
 //Module includes
-include "./modules/Policies/moduleFunctions.php" ;
+include './modules/Policies/moduleFunctions.php';
 
-if (isActionAccessible($guid, $connection2, "/modules/Policies/policies_view.php")==FALSE) {
-	//Acess denied
-	print "<div class='error'>" ;
-		print "You do not have access to this action." ;
-	print "</div>" ;
-}
-else {
-	$highestAction=getHighestGroupedAction($guid, $_GET["q"], $connection2) ;
-	if ($highestAction==FALSE) {
-		print "<div class='error'>" ;
-		print "The highest grouped action cannot be determined." ;
-		print "</div>" ;
-	}
-	else {
-		print "<div class='trail'>" ;
-		print "<div class='trailHead'><a href='" . $_SESSION[$guid]["absoluteURL"] . "'>Home</a> > <a href='" . $_SESSION[$guid]["absoluteURL"] . "/index.php?q=/modules/" . getModuleName($_GET["q"]) . "/" . getModuleEntry($_GET["q"], $connection2, $guid) . "'>" . getModuleName($_GET["q"]) . "</a> > </div><div class='trailEnd'>View Policies</div>" ;
-		print "</div>" ;
-		
-		$allPolicies="" ;
-		if (isset($_GET["allPolicies"])) {
-			$allPolicies=$_GET["allPolicies"] ;
-		}
-	
-		//Build role lookup array
-		$allRoles=array() ;
-		try {
-			$dataRoles=array();  
-			$sqlRoles="SELECT * FROM gibbonRole" ; 
-			$resultRoles=$connection2->prepare($sqlRoles);
-			$resultRoles->execute($dataRoles);
-		}
-		catch(PDOException $e) { }
-		while ($rowRoles=$resultRoles->fetch()) {
-			$allRoles[$rowRoles["gibbonRoleID"]]=$rowRoles["name"] ;
-		}
-	
-		print "<p>" ;
-			if ($highestAction=="View Policies_all") {
-				print "On this page you can see all policies for which you are a member of the designated audience. To view a policy, click on its name in the left-hand column below. As a privileged user, you can also override audience restrictions, and view all policies." ;
-			}
-			else {
-				print "On this page you can see all policies for which you are a member of the designated audience. To view a policy, click on its name in the left-hand column below." ;
-			}
-		print "</p>" ;
-		
-		if ($highestAction=="View Policies_all") {
-			print "<h3 class='top'>" ;
-			print "Filters" ;
-			print "</h3>" ;
-			?>
-			<form method="get" action="<?php print $_SESSION[$guid]["absoluteURL"]?>/index.php">
+if (isActionAccessible($guid, $connection2, '/modules/Policies/policies_view.php') == false) {
+    //Acess denied
+    echo "<div class='error'>";
+    echo 'You do not have access to this action.';
+    echo '</div>';
+} else {
+    $highestAction = getHighestGroupedAction($guid, $_GET['q'], $connection2);
+    if ($highestAction == false) {
+        echo "<div class='error'>";
+        echo 'The highest grouped action cannot be determined.';
+        echo '</div>';
+    } else {
+        echo "<div class='trail'>";
+        echo "<div class='trailHead'><a href='".$_SESSION[$guid]['absoluteURL']."'>Home</a> > <a href='".$_SESSION[$guid]['absoluteURL'].'/index.php?q=/modules/'.getModuleName($_GET['q']).'/'.getModuleEntry($_GET['q'], $connection2, $guid)."'>".getModuleName($_GET['q'])."</a> > </div><div class='trailEnd'>View Policies</div>";
+        echo '</div>';
+
+        $allPolicies = '';
+        if (isset($_GET['allPolicies'])) {
+            $allPolicies = $_GET['allPolicies'];
+        }
+
+        //Build role lookup array
+        $allRoles = array();
+        try {
+            $dataRoles = array();
+            $sqlRoles = 'SELECT * FROM gibbonRole';
+            $resultRoles = $connection2->prepare($sqlRoles);
+            $resultRoles->execute($dataRoles);
+        } catch (PDOException $e) {
+        }
+        while ($rowRoles = $resultRoles->fetch()) {
+            $allRoles[$rowRoles['gibbonRoleID']] = $rowRoles['name'];
+        }
+
+        echo '<p>';
+        if ($highestAction == 'View Policies_all') {
+            echo 'On this page you can see all policies for which you are a member of the designated audience. To view a policy, click on its name in the left-hand column below. As a privileged user, you can also override audience restrictions, and view all policies.';
+        } else {
+            echo 'On this page you can see all policies for which you are a member of the designated audience. To view a policy, click on its name in the left-hand column below.';
+        }
+        echo '</p>';
+
+        if ($highestAction == 'View Policies_all') {
+            echo "<h3 class='top'>";
+            echo 'Filters';
+            echo '</h3>';
+            ?>
+			<form method="get" action="<?php echo $_SESSION[$guid]['absoluteURL']?>/index.php">
 				<table class='smallIntBorder' cellspacing='0' style="width: 100%">	
 					<tr>
 						<td> 
@@ -81,168 +78,161 @@ else {
 						</td>
 						<td class="right">
 							<?php
-							$checked="" ;
-							if ($allPolicies=="on") {
-								$checked="checked" ;
-							}
-							print "<input $checked name=\"allPolicies\" id=\"allPolicies\" type=\"checkbox\">" ;
-							?>
+                            $checked = '';
+            if ($allPolicies == 'on') {
+                $checked = 'checked';
+            }
+            echo "<input $checked name=\"allPolicies\" id=\"allPolicies\" type=\"checkbox\">";
+            ?>
 						</td>
 					</tr>
 					<tr>
 						<td colspan=2 class="right">
-							<input type="hidden" name="q" value="/modules/<?php print $_SESSION[$guid]["module"] ?>/policies_view.php">
-							<input type="hidden" name="address" value="<?php print $_SESSION[$guid]["address"] ?>">
+							<input type="hidden" name="q" value="/modules/<?php echo $_SESSION[$guid]['module'] ?>/policies_view.php">
+							<input type="hidden" name="address" value="<?php echo $_SESSION[$guid]['address'] ?>">
 							<input type="submit" value="Submit">
 						</td>
 					</tr>
 				</table>
 			</form>
 			<?php
-		}
-	
-		try {
-			if ($allPolicies=="on") {
-				$data=array();  
-				$sql="SELECT policiesPolicy.*, gibbonDepartment.name AS department, gibbonPerson.surname, gibbonPerson.preferredName, gibbonPerson.title FROM policiesPolicy JOIN gibbonPerson ON (policiesPolicy.gibbonPersonIDCreator=gibbonPerson.gibbonPersonID) LEFT JOIN gibbonDepartment ON (policiesPolicy.gibbonDepartmentID=gibbonDepartment.gibbonDepartmentID) WHERE active='Y' ORDER BY scope, gibbonDepartment.name, category, policiesPolicy.name" ; 
-			}
-			else {
-				$data=array() ;
-				$idCount=0 ;
-				$idWhere="(" ;
-				foreach ($_SESSION[$guid]["gibbonRoleIDAll"] AS $id) {
-					$data["id$idCount"]="%" . trim($id[0]) . "%" ;
-					$idWhere.="gibbonRoleIDList LIKE :id$idCount OR " ;
-					$idCount++ ;
-				}
-				if ($idWhere=="(") {
-					$idWhere=="" ;
-				}
-				else {
-					$idWhere=substr($idWhere,0,-4) . ")" ;
-				}
-				
-				$sql="SELECT policiesPolicy.*, gibbonDepartment.name AS department, gibbonPerson.surname, gibbonPerson.preferredName, gibbonPerson.title FROM policiesPolicy JOIN gibbonPerson ON (policiesPolicy.gibbonPersonIDCreator=gibbonPerson.gibbonPersonID) LEFT JOIN gibbonDepartment ON (policiesPolicy.gibbonDepartmentID=gibbonDepartment.gibbonDepartmentID) WHERE $idWhere ORDER BY scope, gibbonDepartment.name, category, policiesPolicy.name" ; 
-			}
-			$result=$connection2->prepare($sql);
-			$result->execute($data);
-		}
-		catch(PDOException $e) { 
-			print "<div class='error'>" . $e->getMessage() . "</div>" ; 
-		}
-	
-		if ($result->rowCount()<1) {
-			print "<div class=\"error\">" ;
-				print "There are no policies for you to view" ;
-			print "</div>" ;
-		}
-		else {
-			$lastHeader="" ;
-			$headerCount=0 ;
-			$count=0 ;
-			while ($row=$result->fetch()) {
-				if ($count%2==0) {
-					$rowNum="even" ;
-				}
-				else {
-					$rowNum="odd" ;
-				}
-				$count++ ;
-				
-				if ($row["scope"]=="School") {
-					$currentHeader="School" ;
-				}
-				else {
-					$currentHeader=$row["department"] ;
-				}
-			
-				if ($currentHeader!=$lastHeader) {
-					if ($lastHeader!="") {
-						print "</tr>" ;
-						print "</table>" ;
-					}
-					
-					print "<h2>$currentHeader</h2>" ;
-				
-					$count=0;
-					$rowNum="odd" ;
-					print "<table cellspacing='0' style='width: 100%'>" ;
-					print "<tr class='head'>" ;
-						print "<th style='width: 200px'>" ;
-							print "Name<br/><span style='font-style: italic; font-size: 85%'>Short Name</span>" ;
-						print "</th>" ;
-						print "<th style='width: 200px'>" ;
-							print "Category" ;
-						print "</th>" ;
-						print "<th style='width: 150px'>" ;
-							print "Audience" ;
-						print "</th>" ;
-						print "<th style='width: 200px'>" ;
-							print "Created By" ;
-						print "</th>" ;
-						print "<th style='width: 60px'>" ;
-							print "Action" ;
-						print "</th>" ;
-					print "</tr>" ;
-				
-					$headerCount++ ;
-				}
-			
-				print "<tr class=$rowNum>" ;
-					print "<td>" ;
-						if ($row["type"]=="File") {
-							print "<a style='font-weight: bold' href='" . $_SESSION[$guid]["absoluteURL"] . "/" . $row["location"] ."'>" . $row["name"] . "</a><br/>" ;
-						}
-						else if ($row["type"]=="Link") {
-							print "<a style='font-weight: bold' target='_blank' href='" . $row["location"] ."'>" . $row["name"] . "</a><br/>" ;
-						}
-						print "<span style='font-style: italic; font-size: 85%'>" . $row["nameShort"]  . "</span>" ;
-					print "</td>" ;
-					print "<td>" ;
-						print "<b>" . $row["category"] . "</b>" ;
-					print "</td>" ;
-					print "<td>" ;
-						if ($row["gibbonRoleIDList"]=="") {
-							print "<i>No audience set</i>" ;
-						}
-						else {
-							$roles=explode(",", $row["gibbonRoleIDList"]) ;
-							foreach ($roles AS $role) {
-								print $allRoles[$role] . "<br/>" ;
-							}
-						}
-					print "</td>" ;
-					print "<td>" ;
-						print formatName($row["title"], $row["preferredName"], $row["surname"], "Staff") ;
-					print "</td>" ;
-					print "<td>" ;
-						print "<script type='text/javascript'>" ;	
-							print "$(document).ready(function(){" ;
-								print "\$(\".comment-$count\").hide();" ;
-								print "\$(\".show_hide-$count\").fadeIn(1000);" ;
-								print "\$(\".show_hide-$count\").click(function(){" ;
-								print "\$(\".comment-$count\").fadeToggle(1000);" ;
-								print "});" ;
-							print "});" ;
-						print "</script>" ;
-						if ($row["description"]!="") {
-							print "<a class='show_hide-$count' onclick='false' href='#'><img style='padding-right: 5px' src='" . $_SESSION[$guid]["absoluteURL"] . "/themes/Default/img/page_down.png' title='Show Description' onclick='return false;' /></a>" ;
-						}
-					print "</td>" ;
-				print "</tr>" ;
-				if ($row["description"]!="") {
-					print "<tr class='comment-$count' id='comment-$count'>" ;
-						print "<td style='background-color: #fff' colspan=5>" ;
-							print $row["description"] ;
-						print "</td>" ;
-					print "</tr>" ;
-				}
-			
-				$lastHeader=$currentHeader ;
-			}
-			print "</tr>" ;
-			print "</table>" ;
-		}
-	}	
-}	
+
+        }
+
+        try {
+            if ($allPolicies == 'on') {
+                $data = array();
+                $sql = "SELECT policiesPolicy.*, gibbonDepartment.name AS department, gibbonPerson.surname, gibbonPerson.preferredName, gibbonPerson.title FROM policiesPolicy JOIN gibbonPerson ON (policiesPolicy.gibbonPersonIDCreator=gibbonPerson.gibbonPersonID) LEFT JOIN gibbonDepartment ON (policiesPolicy.gibbonDepartmentID=gibbonDepartment.gibbonDepartmentID) WHERE active='Y' ORDER BY scope, gibbonDepartment.name, category, policiesPolicy.name";
+            } else {
+                $data = array();
+                $idCount = 0;
+                $idWhere = '(';
+                foreach ($_SESSION[$guid]['gibbonRoleIDAll'] as $id) {
+                    $data["id$idCount"] = '%'.trim($id[0]).'%';
+                    $idWhere .= "gibbonRoleIDList LIKE :id$idCount OR ";
+                    ++$idCount;
+                }
+                if ($idWhere == '(') {
+                    $idWhere == '';
+                } else {
+                    $idWhere = substr($idWhere, 0, -4).')';
+                }
+
+                $sql = "SELECT policiesPolicy.*, gibbonDepartment.name AS department, gibbonPerson.surname, gibbonPerson.preferredName, gibbonPerson.title FROM policiesPolicy JOIN gibbonPerson ON (policiesPolicy.gibbonPersonIDCreator=gibbonPerson.gibbonPersonID) LEFT JOIN gibbonDepartment ON (policiesPolicy.gibbonDepartmentID=gibbonDepartment.gibbonDepartmentID) WHERE $idWhere ORDER BY scope, gibbonDepartment.name, category, policiesPolicy.name";
+            }
+            $result = $connection2->prepare($sql);
+            $result->execute($data);
+        } catch (PDOException $e) {
+            echo "<div class='error'>".$e->getMessage().'</div>';
+        }
+
+        if ($result->rowCount() < 1) {
+            echo '<div class="error">';
+            echo 'There are no policies for you to view';
+            echo '</div>';
+        } else {
+            $lastHeader = '';
+            $headerCount = 0;
+            $count = 0;
+            while ($row = $result->fetch()) {
+                if ($count % 2 == 0) {
+                    $rowNum = 'even';
+                } else {
+                    $rowNum = 'odd';
+                }
+                ++$count;
+
+                if ($row['scope'] == 'School') {
+                    $currentHeader = 'School';
+                } else {
+                    $currentHeader = $row['department'];
+                }
+
+                if ($currentHeader != $lastHeader) {
+                    if ($lastHeader != '') {
+                        echo '</tr>';
+                        echo '</table>';
+                    }
+
+                    echo "<h2>$currentHeader</h2>";
+
+                    $count = 0;
+                    $rowNum = 'odd';
+                    echo "<table cellspacing='0' style='width: 100%'>";
+                    echo "<tr class='head'>";
+                    echo "<th style='width: 200px'>";
+                    echo "Name<br/><span style='font-style: italic; font-size: 85%'>Short Name</span>";
+                    echo '</th>';
+                    echo "<th style='width: 200px'>";
+                    echo 'Category';
+                    echo '</th>';
+                    echo "<th style='width: 150px'>";
+                    echo 'Audience';
+                    echo '</th>';
+                    echo "<th style='width: 200px'>";
+                    echo 'Created By';
+                    echo '</th>';
+                    echo "<th style='width: 60px'>";
+                    echo 'Action';
+                    echo '</th>';
+                    echo '</tr>';
+
+                    ++$headerCount;
+                }
+
+                echo "<tr class=$rowNum>";
+                echo '<td>';
+                if ($row['type'] == 'File') {
+                    echo "<a style='font-weight: bold' href='".$_SESSION[$guid]['absoluteURL'].'/'.$row['location']."'>".$row['name'].'</a><br/>';
+                } elseif ($row['type'] == 'Link') {
+                    echo "<a style='font-weight: bold' target='_blank' href='".$row['location']."'>".$row['name'].'</a><br/>';
+                }
+                echo "<span style='font-style: italic; font-size: 85%'>".$row['nameShort'].'</span>';
+                echo '</td>';
+                echo '<td>';
+                echo '<b>'.$row['category'].'</b>';
+                echo '</td>';
+                echo '<td>';
+                if ($row['gibbonRoleIDList'] == '') {
+                    echo '<i>No audience set</i>';
+                } else {
+                    $roles = explode(',', $row['gibbonRoleIDList']);
+                    foreach ($roles as $role) {
+                        echo $allRoles[$role].'<br/>';
+                    }
+                }
+                echo '</td>';
+                echo '<td>';
+                echo formatName($row['title'], $row['preferredName'], $row['surname'], 'Staff');
+                echo '</td>';
+                echo '<td>';
+                echo "<script type='text/javascript'>";
+                echo '$(document).ready(function(){';
+                echo "\$(\".comment-$count\").hide();";
+                echo "\$(\".show_hide-$count\").fadeIn(1000);";
+                echo "\$(\".show_hide-$count\").click(function(){";
+                echo "\$(\".comment-$count\").fadeToggle(1000);";
+                echo '});';
+                echo '});';
+                echo '</script>';
+                if ($row['description'] != '') {
+                    echo "<a class='show_hide-$count' onclick='false' href='#'><img style='padding-right: 5px' src='".$_SESSION[$guid]['absoluteURL']."/themes/Default/img/page_down.png' title='Show Description' onclick='return false;' /></a>";
+                }
+                echo '</td>';
+                echo '</tr>';
+                if ($row['description'] != '') {
+                    echo "<tr class='comment-$count' id='comment-$count'>";
+                    echo "<td style='background-color: #fff' colspan=5>";
+                    echo $row['description'];
+                    echo '</td>';
+                    echo '</tr>';
+                }
+
+                $lastHeader = $currentHeader;
+            }
+            echo '</tr>';
+            echo '</table>';
+        }
+    }
+}
 ?>
