@@ -84,8 +84,7 @@ if (isActionAccessible($guid, $connection2, '/modules/Policies/policies_manage.p
 					<input type="hidden" name="q" value="/modules/<?php echo $_SESSION[$guid]['module'] ?>/policies_manage.php">
 					<input type="hidden" name="address" value="<?php echo $_SESSION[$guid]['address'] ?>">
 					<?php
-                    echo "<a href='".$_SESSION[$guid]['absoluteURL'].'/index.php?q=/modules/'.$_SESSION[$guid]['module']."/policies_manage.php'>Clear Search</a> ";
-    ?>
+                    echo "<a href='".$_SESSION[$guid]['absoluteURL'].'/index.php?q=/modules/'.$_SESSION[$guid]['module']."/policies_manage.php'>Clear Search</a> "; ?>
 					<input type="submit" value="Submit">
 				</td>
 			</tr>
@@ -107,16 +106,14 @@ if (isActionAccessible($guid, $connection2, '/modules/Policies/policies_manage.p
         $sqlPage = $sql.' LIMIT '.$_SESSION[$guid]['pagination'].' OFFSET '.(($page - 1) * $_SESSION[$guid]['pagination']);
         $result = $connection2->prepare($sql);
         $result->execute($data);
-    } catch (PDOException $e) {
-        echo "<div class='error'>".$e->getMessage().'</div>';
+    } catch (PDOException $e) { echo "<div class='error'>".$e->getMessage().'</div>';
     }
 
     echo "<div class='linkTop'>";
     echo "<a href='".$_SESSION[$guid]['absoluteURL']."/index.php?q=/modules/Policies/policies_manage_add.php&search=$search'><img title='New' src='./themes/".$_SESSION[$guid]['gibbonThemeName']."/img/page_new.png'/></a>";
     echo '</div>';
 
-    if ($result->rowCount() < 1) {
-        echo "<div class='error'>";
+    if ($result->rowCount() < 1) { echo "<div class='error'>";
         echo 'There are no policies to display.';
         echo '</div>';
     } else {
@@ -163,8 +160,8 @@ if (isActionAccessible($guid, $connection2, '/modules/Policies/policies_manage.p
                 $rowNum = 'error';
             }
 
-                //COLOR ROW BY STATUS!
-                echo "<tr class=$rowNum>";
+			//COLOR ROW BY STATUS!
+			echo "<tr class=$rowNum>";
             echo '<td>';
             if ($row['type'] == 'File') {
                 echo "<a style='font-weight: bold' href='".$_SESSION[$guid]['absoluteURL'].'/'.$row['location']."'>".$row['name'].'</a><br/>';

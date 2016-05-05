@@ -64,3 +64,8 @@ $sql[$count][0] = '1.0.11';
 $sql[$count][1] = "
 UPDATE gibbonAction SET category='Policies' WHERE gibbonModuleID=(SELECT gibbonModuleID FROM gibbonModule WHERE name='Policies');end
 ";
+
+//v1.0.12
+++$count;
+$sql[$count][0] = '1.0.12';
+$sql[$count][1] = '';

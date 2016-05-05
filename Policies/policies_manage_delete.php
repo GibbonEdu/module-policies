@@ -39,8 +39,7 @@ if (isActionAccessible($guid, $connection2, '/modules/Policies/policies_manage_d
 
     //Check if school year specified
     $policiesPolicyID = $_GET['policiesPolicyID'];
-    if ($policiesPolicyID == '') {
-        echo "<div class='error'>";
+    if ($policiesPolicyID == '') { echo "<div class='error'>";
         echo 'You have not specified a policy.';
         echo '</div>';
     } else {

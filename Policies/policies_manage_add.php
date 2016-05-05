@@ -42,8 +42,7 @@ if (isActionAccessible($guid, $connection2, '/modules/Policies/policies_manage_a
     }
 
 
-    if ($_GET['search'] != '') {
-        echo "<div class='linkTop'>";
+    if ($_GET['search'] != '') { echo "<div class='linkTop'>";
         echo "<a href='".$_SESSION[$guid]['absoluteURL'].'/index.php?q=/modules/Policies/policies_manage.php&search='.$_GET['search']."'>Back to Search Results</a>";
         echo '</div>';
     }
@@ -99,14 +98,14 @@ if (isActionAccessible($guid, $connection2, '/modules/Policies/policies_manage_a
                         $resultSelect->execute($dataSelect);
                     } catch (PDOException $e) {
                     }
-    ?>
+    				?>
 					<select name="gibbonDepartmentID" id="gibbonDepartmentID" style="width: 302px">
 						<option value="Please select...">Please select...</option>
 						<?php
                         while ($rowSelect = $resultSelect->fetch()) {
                             echo "<option value='".$rowSelect['gibbonDepartmentID']."'>".$rowSelect['name'].'</option>';
                         }
-    ?>
+   						?>
 					</select>
 					<script type="text/javascript">
 						var gibbonDepartmentID=new LiveValidation('gibbonDepartmentID');
@@ -168,10 +167,10 @@ if (isActionAccessible($guid, $connection2, '/modules/Policies/policies_manage_a
                                 } catch (PDOException $e) {
                                 }
 
-    while ($rowAuto = $resultAuto->fetch()) {
-        echo '"'.$rowAuto['category'].'", ';
-    }
-    ?>
+								while ($rowAuto = $resultAuto->fetch()) {
+									echo '"'.$rowAuto['category'].'", ';
+								}
+								?>
 							];
 							$( "#category" ).autocomplete({source: availableTags});
 						});
@@ -230,15 +229,14 @@ if (isActionAccessible($guid, $connection2, '/modules/Policies/policies_manage_a
                         $resultExt->execute($dataExt);
                     } catch (PDOException $e) {
                     }
-    $ext = '';
-    while ($rowExt = $resultExt->fetch()) {
-        $ext = $ext."'.".$rowExt['extension']."',";
-    }
-    ?>
+					$ext = '';
+					while ($rowExt = $resultExt->fetch()) {
+						$ext = $ext."'.".$rowExt['extension']."',";
+					}
+					?>
 					<script type="text/javascript">
 						var file=new LiveValidation('file');
-						file.add( Validate.Inclusion, { within: [<?php echo $ext;
-    ?>], failureMessage: "Illegal file type!", partialMatch: true, caseSensitive: false } );
+						file.add( Validate.Inclusion, { within: [<?php echo $ext; ?>], failureMessage: "Illegal file type!", partialMatch: true, caseSensitive: false } );
 					</script>
 				</td>
 			</tr>
@@ -262,18 +260,18 @@ if (isActionAccessible($guid, $connection2, '/modules/Policies/policies_manage_a
 				<td class="right">
 					<?php
                     $roleCount = 0;
-    try {
-        $dataRoles = array();
-        $sqlRoles = 'SELECT * FROM gibbonRole ORDER BY name';
-        $resultRoles = $connection2->prepare($sqlRoles);
-        $resultRoles->execute($dataRoles);
-    } catch (PDOException $e) {
-    }
-    while ($rowRoles = $resultRoles->fetch()) {
-        echo $rowRoles['name']." <input type='checkbox' name='gibbonRoleID$roleCount' value='".$rowRoles['gibbonRoleID']."'><br/>";
-        ++$roleCount;
-    }
-    ?>
+					try {
+						$dataRoles = array();
+						$sqlRoles = 'SELECT * FROM gibbonRole ORDER BY name';
+						$resultRoles = $connection2->prepare($sqlRoles);
+						$resultRoles->execute($dataRoles);
+					} catch (PDOException $e) {
+					}
+					while ($rowRoles = $resultRoles->fetch()) {
+						echo $rowRoles['name']." <input type='checkbox' name='gibbonRoleID$roleCount' value='".$rowRoles['gibbonRoleID']."'><br/>";
+						++$roleCount;
+					}
+					?>
 					<input type="hidden" name="roleCount" value="<?php echo $roleCount ?>">
 				</td>
 			</tr>

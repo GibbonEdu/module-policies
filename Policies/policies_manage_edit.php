@@ -39,8 +39,7 @@ if (isActionAccessible($guid, $connection2, '/modules/Policies/policies_manage_e
 
     //Check if school year specified
     $policiesPolicyID = $_GET['policiesPolicyID'];
-    if ($policiesPolicyID == '') {
-        echo "<div class='error'>";
+    if ($policiesPolicyID == '') { echo "<div class='error'>";
         echo 'You have not specified a policy.';
         echo '</div>';
     } else {
@@ -108,7 +107,7 @@ if (isActionAccessible($guid, $connection2, '/modules/Policies/policies_manage_e
 						<?php
 
                     }
-            ?>
+            		?>
 					<tr>
 						<td>
 							<b>Name *</b><br/>
@@ -140,14 +139,8 @@ if (isActionAccessible($guid, $connection2, '/modules/Policies/policies_manage_e
 						</td>
 						<td class="right">
 							<select name="active" id="active" style="width: 302px">
-								<option <?php if ($row['active'] == 'Y') {
-    echo 'selected';
-}
-            ?> value="Y">Y</option>
-								<option <?php if ($row['active'] == 'N') {
-    echo 'selected';
-}
-            ?> value="N">N</option>
+								<option <?php if ($row['active'] == 'Y') { echo 'selected'; } ?> value="Y">Y</option>
+								<option <?php if ($row['active'] == 'N') { echo 'selected'; } ?> value="N">N</option>
 							</select>
 						</td>
 					</tr>
@@ -169,10 +162,10 @@ if (isActionAccessible($guid, $connection2, '/modules/Policies/policies_manage_e
                                         } catch (PDOException $e) {
                                         }
 
-            while ($rowAuto = $resultAuto->fetch()) {
-                echo '"'.$rowAuto['category'].'", ';
-            }
-            ?>
+										while ($rowAuto = $resultAuto->fetch()) {
+											echo '"'.$rowAuto['category'].'", ';
+										}
+										?>
 									];
 									$( "#category" ).autocomplete({source: availableTags});
 								});
@@ -207,9 +200,7 @@ if (isActionAccessible($guid, $connection2, '/modules/Policies/policies_manage_e
                             if ($row['type'] == 'File') {
                                 echo "<a style='font-weight: bold' href='".$_SESSION[$guid]['absoluteURL'].'/'.$row['location']."'>".$_SESSION[$guid]['absoluteURL'].'/'.$row['location'].'</a><br/>';
                             } elseif ($row['type'] == 'Link') {
-                                echo "<a style='font-weight: bold' target='_blank' href='".$row['location']."'>".$row['location'].'</a><br/>';
-                            }
-            ?>
+                                echo "<a style='font-weight: bold' target='_blank' href='".$row['location']."'>".$row['location'].'</a><br/>'; } ?>
 							</div>
 						</td>
 					</tr>
@@ -221,22 +212,22 @@ if (isActionAccessible($guid, $connection2, '/modules/Policies/policies_manage_e
 						<td class="right">
 							<?php
                             $roleCount = 0;
-            try {
-                $dataRoles = array();
-                $sqlRoles = 'SELECT * FROM gibbonRole ORDER BY name';
-                $resultRoles = $connection2->prepare($sqlRoles);
-                $resultRoles->execute($dataRoles);
-            } catch (PDOException $e) {
-            }
-            while ($rowRoles = $resultRoles->fetch()) {
-                $checked = '';
-                if (is_numeric(strpos($row['gibbonRoleIDList'], $rowRoles['gibbonRoleID']))) {
-                    $checked = 'checked';
-                }
-                echo $rowRoles['name']." <input $checked type='checkbox' name='gibbonRoleID$roleCount' value='".$rowRoles['gibbonRoleID']."'><br/>";
-                ++$roleCount;
-            }
-            ?>
+							try {
+								$dataRoles = array();
+								$sqlRoles = 'SELECT * FROM gibbonRole ORDER BY name';
+								$resultRoles = $connection2->prepare($sqlRoles);
+								$resultRoles->execute($dataRoles);
+							} catch (PDOException $e) {
+							}
+							while ($rowRoles = $resultRoles->fetch()) {
+								$checked = '';
+								if (is_numeric(strpos($row['gibbonRoleIDList'], $rowRoles['gibbonRoleID']))) {
+									$checked = 'checked';
+								}
+								echo $rowRoles['name']." <input $checked type='checkbox' name='gibbonRoleID$roleCount' value='".$rowRoles['gibbonRoleID']."'><br/>";
+								++$roleCount;
+							}
+							?>
 							<input type="hidden" name="roleCount" value="<?php echo $roleCount ?>">
 						</td>
 					</tr>

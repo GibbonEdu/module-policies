@@ -29,8 +29,7 @@ if (isActionAccessible($guid, $connection2, '/modules/Policies/policies_view.php
     echo '</div>';
 } else {
     $highestAction = getHighestGroupedAction($guid, $_GET['q'], $connection2);
-    if ($highestAction == false) {
-        echo "<div class='error'>";
+    if ($highestAction == false) { echo "<div class='error'>";
         echo 'The highest grouped action cannot be determined.';
         echo '</div>';
     } else {
@@ -79,11 +78,11 @@ if (isActionAccessible($guid, $connection2, '/modules/Policies/policies_view.php
 						<td class="right">
 							<?php
                             $checked = '';
-            if ($allPolicies == 'on') {
-                $checked = 'checked';
-            }
-            echo "<input $checked name=\"allPolicies\" id=\"allPolicies\" type=\"checkbox\">";
-            ?>
+							if ($allPolicies == 'on') {
+								$checked = 'checked';
+							}
+							echo "<input $checked name=\"allPolicies\" id=\"allPolicies\" type=\"checkbox\">";
+							?>
 						</td>
 					</tr>
 					<tr>
