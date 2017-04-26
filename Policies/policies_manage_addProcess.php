@@ -91,30 +91,25 @@ if (isActionAccessible($guid, $connection2, '/modules/Policies/policies_manage_a
             if ($resultExt->rowCount() != 1) {
                 $partialFail = true;
             } else {
-                //Attempt file upload
-                $time = time();
-                if ($_FILES['file']['tmp_name'] != '') {
-                    //Check for folder in uploads based on today's date
-                    $path = $_SESSION[$guid]['absolutePath'];
-                    if (is_dir($path.'/uploads/'.date('Y', $time).'/'.date('m', $time)) == false) {
-                        mkdir($path.'/uploads/'.date('Y', $time).'/'.date('m', $time), 0777, true);
-                    }
-                    $unique = false;
-                    while ($unique == false) {
-                        $suffix = randomPassword(16);
-                        $location = 'uploads/'.date('Y', $time).'/'.date('m', $time).'/policy_'.str_replace(' ', '_', trim($name))."_$suffix".strrchr($_FILES['file']['name'], '.');
-                        if (!(file_exists($path.'/'.$location))) {
-                            $unique = true;
-                        }
-                    }
+                //Move attached image  file, if there is one
+                if (!empty($_FILES['file']['tmp_name'])) {
+                    $fileUploader = new Gibbon\FileUploader($pdo, $gibbon->session);
 
-                    if (!(move_uploaded_file($_FILES['file']['tmp_name'], $path.'/'.$location))) {
+                    $file = (isset($_FILES['file']))? $_FILES['file'] : null;
+
+                    // Upload the file, return the /uploads relative path
+                    $location = $fileUploader->uploadFromPost($file, 'policy_');
+
+                    if (empty($location)) {
                         //Fail 5
                         $URL = $URL.'&return=error5';
                         header("Location: {$URL}");
                     }
-                } else {
-                    $partialFail = true;
+                }
+                else {
+                    //Fail 5
+                    $URL = $URL.'&return=error5';
+                    header("Location: {$URL}");
                 }
             }
         }
