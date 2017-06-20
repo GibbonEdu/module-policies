@@ -69,9 +69,9 @@ if (isActionAccessible($guid, $connection2, '/modules/Policies/policies_view.php
             echo '</h3>';
             ?>
 			<form method="get" action="<?php echo $_SESSION[$guid]['absoluteURL']?>/index.php">
-				<table class='smallIntBorder' cellspacing='0' style="width: 100%">	
+				<table class='smallIntBorder' cellspacing='0' style="width: 100%">
 					<tr>
-						<td> 
+						<td>
 							<b>All Policies</b><br/>
 							<span style="font-size: 90%"><i>Override audience to reveal all policies.</i></span>
 						</td>
@@ -104,17 +104,17 @@ if (isActionAccessible($guid, $connection2, '/modules/Policies/policies_view.php
                 $sql = "SELECT policiesPolicy.*, gibbonDepartment.name AS department, gibbonPerson.surname, gibbonPerson.preferredName, gibbonPerson.title FROM policiesPolicy JOIN gibbonPerson ON (policiesPolicy.gibbonPersonIDCreator=gibbonPerson.gibbonPersonID) LEFT JOIN gibbonDepartment ON (policiesPolicy.gibbonDepartmentID=gibbonDepartment.gibbonDepartmentID) WHERE active='Y' ORDER BY scope, gibbonDepartment.name, category, policiesPolicy.name";
             } else {
                 $data = array();
-                $idCount = 0;
-                $idWhere = '(';
-                foreach ($_SESSION[$guid]['gibbonRoleIDAll'] as $id) {
-                    $data["id$idCount"] = '%'.trim($id[0]).'%';
-                    $idWhere .= "gibbonRoleIDList LIKE :id$idCount OR ";
-                    ++$idCount;
+                $idWhere = "(";
+                $data["role"] = '%'.$_SESSION[$guid]['gibbonRoleIDCurrent'].'%';
+                $idWhere .= "gibbonRoleIDList LIKE :role";
+                $roleCategory = getRoleCategory($_SESSION[$guid]['gibbonRoleIDCurrent'], $connection2);
+                if ($roleCategory == 'Parent' || $roleCategory == 'Staff' || $roleCategory == 'Student') {
+                    $idWhere .= " OR ".strtolower($roleCategory)."='Y'";
                 }
                 if ($idWhere == '(') {
-                    $idWhere == '';
+                    $idWhere = '';
                 } else {
-                    $idWhere = substr($idWhere, 0, -4).')';
+                    $idWhere .= ")";
                 }
 
                 $sql = "SELECT policiesPolicy.*, gibbonDepartment.name AS department, gibbonPerson.surname, gibbonPerson.preferredName, gibbonPerson.title FROM policiesPolicy JOIN gibbonPerson ON (policiesPolicy.gibbonPersonIDCreator=gibbonPerson.gibbonPersonID) LEFT JOIN gibbonDepartment ON (policiesPolicy.gibbonDepartmentID=gibbonDepartment.gibbonDepartmentID) WHERE $idWhere ORDER BY scope, gibbonDepartment.name, category, policiesPolicy.name";
@@ -192,12 +192,23 @@ if (isActionAccessible($guid, $connection2, '/modules/Policies/policies_view.php
                 echo '<b>'.$row['category'].'</b>';
                 echo '</td>';
                 echo '<td>';
-                if ($row['gibbonRoleIDList'] == '') {
+                if ($row['gibbonRoleIDList'] == '' && $row['parent'] == 'N' && $row['staff'] == 'N' && $row['student'] == 'N') {
                     echo '<i>No audience set</i>';
                 } else {
-                    $roles = explode(',', $row['gibbonRoleIDList']);
-                    foreach ($roles as $role) {
-                        echo $allRoles[$role].'<br/>';
+                    if ($row['gibbonRoleIDList'] != '') {
+                        $roles = explode(',', $row['gibbonRoleIDList']);
+                        foreach ($roles as $role) {
+                            echo $allRoles[$role].'<br/>';
+                        }
+                    }
+                    if ($row['parent'] == 'Y') {
+                        print "Parents<br/>";
+                    }
+                    if ($row['staff'] == 'Y') {
+                        print "Staff<br/>";
+                    }
+                    if ($row['student'] == 'Y') {
+                        print "Students<br/>";
                     }
                 }
                 echo '</td>';

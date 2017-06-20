@@ -25,7 +25,7 @@ $description = 'A place to store, share and view school policies, either as file
 $entryURL = 'policies_view.php';
 $type = 'Additional';
 $category = 'Other';
-$version = '1.0.13';
+$version = '1.1.00';
 $author = 'Ross Parker';
 $url = 'http://rossparker.org';
 
@@ -41,6 +41,9 @@ $moduleTables[0] = "CREATE TABLE `policiesPolicy` (
   `gibbonDepartmentID` int(4) unsigned zerofill DEFAULT NULL,
   `type` enum('File','Link') NOT NULL DEFAULT 'Link',
   `gibbonRoleIDList` varchar(255) NOT NULL,
+  `staff` enum('N','Y') NOT NULL DEFAULT 'N',
+  `student` enum('N','Y') NOT NULL DEFAULT 'N',
+  `parent` enum('N','Y') NOT NULL DEFAULT 'N',
   `location` varchar(255) NOT NULL,
   `gibbonPersonIDCreator` int(8) unsigned zerofill NOT NULL,
   `timestampCreated` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,

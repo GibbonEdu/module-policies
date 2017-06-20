@@ -178,12 +178,23 @@ if (isActionAccessible($guid, $connection2, '/modules/Policies/policies_manage.p
             echo $row['category'];
             echo '</td>';
             echo '<td>';
-            if ($row['gibbonRoleIDList'] == '') {
+            if ($row['gibbonRoleIDList'] == '' && $row['parent'] == 'N' && $row['staff'] == 'N' && $row['student'] == 'N') {
                 echo '<i>No audience set</i>';
             } else {
-                $roles = explode(',', $row['gibbonRoleIDList']);
-                foreach ($roles as $role) {
-                    echo $allRoles[$role].'<br/>';
+                if ($row['gibbonRoleIDList'] != '') {
+                    $roles = explode(',', $row['gibbonRoleIDList']);
+                    foreach ($roles as $role) {
+                        echo $allRoles[$role].'<br/>';
+                    }
+                }
+                if ($row['parent'] == 'Y') {
+                    print "Parents<br/>";
+                }
+                if ($row['staff'] == 'Y') {
+                    print "Staff<br/>";
+                }
+                if ($row['student'] == 'Y') {
+                    print "Students<br/>";
                 }
             }
             echo '</td>';

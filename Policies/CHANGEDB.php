@@ -74,3 +74,10 @@ $sql[$count][1] = '';
 ++$count;
 $sql[$count][0] = '1.0.13';
 $sql[$count][1] = '';
+
+//v1.1.00
+++$count;
+$sql[$count][0] = '1.1.00';
+$sql[$count][1] = "
+ALTER TABLE `policiesPolicy` ADD `staff` ENUM('N','Y') NOT NULL DEFAULT 'N' AFTER `gibbonRoleIDList`, ADD `student` ENUM('N','Y') NOT NULL DEFAULT 'N' AFTER `staff`, ADD `parent` ENUM('N','Y') NOT NULL DEFAULT 'N' AFTER `student`;end
+";

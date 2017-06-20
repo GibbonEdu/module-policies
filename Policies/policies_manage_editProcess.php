@@ -85,6 +85,18 @@ if (isActionAccessible($guid, $connection2, '/modules/Policies/policies_manage_e
             if (substr($gibbonRoleIDList, -1) == ',') {
                 $gibbonRoleIDList = substr($gibbonRoleIDList, 0, -1);
             }
+            $parent = 'N';
+            if (isset($_POST['parent']) && $_POST['parent'] == 'Y') {
+                $parent = 'Y';
+            }
+            $staff = 'N';
+            if (isset($_POST['staff']) && $_POST['staff'] == 'Y') {
+                $staff = 'Y';
+            }
+            $student = 'N';
+            if (isset($_POST['student']) && $_POST['student'] == 'Y') {
+                $student = 'Y';
+            }
 
             if ($name == '' or $nameShort == '' or $active == '') {
                 //Fail 3
@@ -93,8 +105,8 @@ if (isActionAccessible($guid, $connection2, '/modules/Policies/policies_manage_e
             } else {
                 //Write to database
                 try {
-                    $data = array('name' => $name, 'nameShort' => $nameShort, 'active' => $active, 'category' => $category, 'description' => $description, 'gibbonRoleIDList' => $gibbonRoleIDList, 'policiesPolicyID' => $policiesPolicyID);
-                    $sql = 'UPDATE policiesPolicy SET name=:name, nameShort=:nameShort, active=:active, category=:category, description=:description, gibbonRoleIDList=:gibbonRoleIDList WHERE policiesPolicyID=:policiesPolicyID';
+                    $data = array('name' => $name, 'nameShort' => $nameShort, 'active' => $active, 'category' => $category, 'description' => $description, 'gibbonRoleIDList' => $gibbonRoleIDList, 'parent' => $parent, 'staff' => $staff, 'student' => $student, 'policiesPolicyID' => $policiesPolicyID);
+                    $sql = 'UPDATE policiesPolicy SET name=:name, nameShort=:nameShort, active=:active, category=:category, description=:description, gibbonRoleIDList=:gibbonRoleIDList, parent=:parent, staff=:staff, student=:student WHERE policiesPolicyID=:policiesPolicyID';
                     $result = $connection2->prepare($sql);
                     $result->execute($data);
                 } catch (PDOException $e) {

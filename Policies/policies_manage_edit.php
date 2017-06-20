@@ -204,9 +204,20 @@ if (isActionAccessible($guid, $connection2, '/modules/Policies/policies_manage_e
 							</div>
 						</td>
 					</tr>
+                    <tr>
+                        <td>
+                            <b>Audience By Role Category </b><br/>
+                            <span style="font-size: 90%"><i>User role categories who should have view access.<br/></i></span>
+                        </td>
+                        <td class="right">
+                            Parents <input <?php if ($row['parent'] == 'Y') { echo 'checked' ;} ?> type='checkbox' name='parent' value='Y'><br/>
+                            Staff <input <?php if ($row['staff'] == 'Y') { echo 'checked' ;} ?> type='checkbox' name='staff' value='Y'><br/>
+                            Students <input <?php if ($row['student'] == 'Y') { echo 'checked' ;} ?> type='checkbox' name='student' value='Y'><br/>
+                        </td>
+                    </tr>
 					<tr>
 						<td>
-							<b>Audience</b><br/>
+							<b>Audience By Role</b><br/>
 							<span style="font-size: 90%"><i>User role groups who should have view access.<br/></i></span>
 						</td>
 						<td class="right">

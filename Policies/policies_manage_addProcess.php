@@ -67,6 +67,18 @@ if (isActionAccessible($guid, $connection2, '/modules/Policies/policies_manage_a
     if (substr($gibbonRoleIDList, -1) == ',') {
         $gibbonRoleIDList = substr($gibbonRoleIDList, 0, -1);
     }
+    $parent = 'N';
+    if (isset($_POST['parent']) && $_POST['parent'] == 'Y') {
+        $parent = 'Y';
+    }
+    $staff = 'N';
+    if (isset($_POST['staff']) && $_POST['staff'] == 'Y') {
+        $staff = 'Y';
+    }
+    $student = 'N';
+    if (isset($_POST['student']) && $_POST['student'] == 'Y') {
+        $student = 'Y';
+    }
 
     if ($scope == '' or ($scope == 'Department' and is_null($gibbonDepartmentID)) or $name == '' or $nameShort == '' or $active == '' or $type == '' or ($type == 'Link' and $link == '')) {
         //Fail 3
@@ -122,8 +134,8 @@ if (isActionAccessible($guid, $connection2, '/modules/Policies/policies_manage_a
         } else {
             //Write to database
             try {
-                $data = array('scope' => $scope, 'gibbonDepartmentID' => $gibbonDepartmentID, 'name' => $name, 'nameShort' => $nameShort, 'active' => $active, 'category' => $category, 'description' => $description, 'type' => $type, 'location' => $location, 'gibbonRoleIDList' => $gibbonRoleIDList, 'gibbonPersonIDCreator' => $_SESSION[$guid]['gibbonPersonID'], 'timestampCreated' => date('Y-m-d H:i:s'));
-                $sql = 'INSERT INTO policiesPolicy SET scope=:scope, gibbonDepartmentID=:gibbonDepartmentID, name=:name, nameShort=:nameShort, active=:active, category=:category, description=:description, type=:type, location=:location, gibbonRoleIDList=:gibbonRoleIDList, gibbonPersonIDCreator=:gibbonPersonIDCreator, timestampCreated=:timestampCreated';
+                $data = array('scope' => $scope, 'gibbonDepartmentID' => $gibbonDepartmentID, 'name' => $name, 'nameShort' => $nameShort, 'active' => $active, 'category' => $category, 'description' => $description, 'type' => $type, 'location' => $location, 'gibbonRoleIDList' => $gibbonRoleIDList, 'parent' => $parent, 'staff' => $staff, 'student' => $student, 'gibbonPersonIDCreator' => $_SESSION[$guid]['gibbonPersonID'], 'timestampCreated' => date('Y-m-d H:i:s'));
+                $sql = 'INSERT INTO policiesPolicy SET scope=:scope, gibbonDepartmentID=:gibbonDepartmentID, name=:name, nameShort=:nameShort, active=:active, category=:category, description=:description, type=:type, location=:location, gibbonRoleIDList=:gibbonRoleIDList, parent=:parent, staff=:staff, student=:student, gibbonPersonIDCreator=:gibbonPersonIDCreator, timestampCreated=:timestampCreated';
                 $result = $connection2->prepare($sql);
                 $result->execute($data);
             } catch (PDOException $e) {

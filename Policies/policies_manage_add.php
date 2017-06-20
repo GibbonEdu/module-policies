@@ -252,9 +252,20 @@ if (isActionAccessible($guid, $connection2, '/modules/Policies/policies_manage_a
 					</script>
 				</td>
 			</tr>
+            <tr>
+                <td>
+                    <b>Audience By Role Category </b><br/>
+                    <span style="font-size: 90%"><i>User role categories who should have view access.<br/></i></span>
+                </td>
+                <td class="right">
+                    Parents <input type='checkbox' name='parent' value='Y'><br/>
+                    Staff <input type='checkbox' name='staff' value='Y'><br/>
+                    Students <input type='checkbox' name='student' value='Y'><br/>
+                </td>
+            </tr>
 			<tr>
 				<td>
-					<b>Audience</b><br/>
+					<b>Audience By Role</b><br/>
 					<span style="font-size: 90%"><i>User role groups who should have view access.<br/></i></span>
 				</td>
 				<td class="right">
@@ -275,9 +286,7 @@ if (isActionAccessible($guid, $connection2, '/modules/Policies/policies_manage_a
 					<input type="hidden" name="roleCount" value="<?php echo $roleCount ?>">
 				</td>
 			</tr>
-
 			<tr>
-
 				<td>
 					<span style="font-size: 90%"><i>* denotes a required field</i></span>
 				</td>
