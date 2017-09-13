@@ -104,7 +104,7 @@ if (isActionAccessible($guid, $connection2, '/modules/Policies/policies_view.php
                 $sql = "SELECT policiesPolicy.*, gibbonDepartment.name AS department, gibbonPerson.surname, gibbonPerson.preferredName, gibbonPerson.title FROM policiesPolicy JOIN gibbonPerson ON (policiesPolicy.gibbonPersonIDCreator=gibbonPerson.gibbonPersonID) LEFT JOIN gibbonDepartment ON (policiesPolicy.gibbonDepartmentID=gibbonDepartment.gibbonDepartmentID) WHERE active='Y' ORDER BY scope, gibbonDepartment.name, category, policiesPolicy.name";
             } else {
                 $data = array();
-                $idWhere = "(";
+                $idWhere = " AND (";
                 $data["role"] = '%'.$_SESSION[$guid]['gibbonRoleIDCurrent'].'%';
                 $idWhere .= "gibbonRoleIDList LIKE :role";
                 $roleCategory = getRoleCategory($_SESSION[$guid]['gibbonRoleIDCurrent'], $connection2);
@@ -117,7 +117,7 @@ if (isActionAccessible($guid, $connection2, '/modules/Policies/policies_view.php
                     $idWhere .= ")";
                 }
 
-                $sql = "SELECT policiesPolicy.*, gibbonDepartment.name AS department, gibbonPerson.surname, gibbonPerson.preferredName, gibbonPerson.title FROM policiesPolicy JOIN gibbonPerson ON (policiesPolicy.gibbonPersonIDCreator=gibbonPerson.gibbonPersonID) LEFT JOIN gibbonDepartment ON (policiesPolicy.gibbonDepartmentID=gibbonDepartment.gibbonDepartmentID) WHERE $idWhere ORDER BY scope, gibbonDepartment.name, category, policiesPolicy.name";
+                $sql = "SELECT policiesPolicy.*, gibbonDepartment.name AS department, gibbonPerson.surname, gibbonPerson.preferredName, gibbonPerson.title FROM policiesPolicy JOIN gibbonPerson ON (policiesPolicy.gibbonPersonIDCreator=gibbonPerson.gibbonPersonID) LEFT JOIN gibbonDepartment ON (policiesPolicy.gibbonDepartmentID=gibbonDepartment.gibbonDepartmentID) WHERE active='Y' $idWhere ORDER BY scope, gibbonDepartment.name, category, policiesPolicy.name";
             }
             $result = $connection2->prepare($sql);
             $result->execute($data);

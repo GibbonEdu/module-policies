@@ -135,7 +135,7 @@ if (isActionAccessible($guid, $connection2, '/modules/Policies/policies_manage.p
         echo '<th>';
         echo 'Audience';
         echo '</th>';
-        echo "<th style='width: 100px'>";
+        echo "<th style='width: 120px'>";
         echo 'Actions';
         echo '</th>';
         echo '</tr>';

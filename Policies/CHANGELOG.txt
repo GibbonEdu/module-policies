@@ -1,5 +1,9 @@
 CHANGELOG
 =========
+v1.1.01
+-------
+Fixed issue leading to inactive policies being displayed in view mode
+
 v1.1.00
 -------
 Switched access settings from role to role or role category
