@@ -1,5 +1,9 @@
 CHANGELOG
 =========
+v1.1.02
+-------
+Added editing of policy links 
+
 v1.1.01
 -------
 Fixed issue leading to inactive policies being displayed in view mode

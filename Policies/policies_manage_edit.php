@@ -192,7 +192,11 @@ if (isActionAccessible($guid, $connection2, '/modules/Policies/policies_manage_e
 					<tr>
 						<td>
 							<b>Policy *</b><br/>
-							<span style="font-size: 90%"><i>This value cannot be changed</i></span>
+                            <?php
+                            if ($row['type'] == 'File') {
+                                echo '<span style="font-size: 90%"><i>This value cannot be changed</i></span>';
+                            }
+                            ?>
 						</td>
 						<td class="right">
 							<div style='text-align: left ;float: right; width: 300px;'>
@@ -200,7 +204,15 @@ if (isActionAccessible($guid, $connection2, '/modules/Policies/policies_manage_e
                             if ($row['type'] == 'File') {
                                 echo "<a style='font-weight: bold' href='".$_SESSION[$guid]['absoluteURL'].'/'.$row['location']."'>".$_SESSION[$guid]['absoluteURL'].'/'.$row['location'].'</a><br/>';
                             } elseif ($row['type'] == 'Link') {
-                                echo "<a style='font-weight: bold' target='_blank' href='".$row['location']."'>".$row['location'].'</a><br/>'; } ?>
+                                ?>
+                                <input name="link" id="link" maxlength=255 value="<?php echo $row['location'] ?>" type="text" style="width: 300px">
+            					<script type="text/javascript">
+            						var link=new LiveValidation('link');
+            						link.add( Validate.Inclusion, { within: ['http://', 'https://'], failureMessage: "Address must start with http:// or https://", partialMatch: true } );
+            					</script>
+                                <?php
+                            }
+                            ?>
 							</div>
 						</td>
 					</tr>

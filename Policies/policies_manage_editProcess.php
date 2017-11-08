@@ -68,12 +68,18 @@ if (isActionAccessible($guid, $connection2, '/modules/Policies/policies_manage_e
             $URL = $URL.'&return=error2';
             header("Location: {$URL}");
         } else {
+            $row = $result->fetch();
+
             //Validate Inputs
             $name = $_POST['name'];
             $nameShort = $_POST['nameShort'];
             $active = $_POST['active'];
             $category = $_POST['category'];
             $description = $_POST['description'];
+            $location = $row['location'];
+            if ($row['type'] == 'Link' && !empty($_POST['link'])) {
+                $location = $_POST['link'] ;
+            }
             $gibbonRoleIDList = '';
             for ($i = 0; $i < $_POST['roleCount']; ++$i) {
                 if (isset($_POST['gibbonRoleID'.$i])) {
@@ -105,8 +111,8 @@ if (isActionAccessible($guid, $connection2, '/modules/Policies/policies_manage_e
             } else {
                 //Write to database
                 try {
-                    $data = array('name' => $name, 'nameShort' => $nameShort, 'active' => $active, 'category' => $category, 'description' => $description, 'gibbonRoleIDList' => $gibbonRoleIDList, 'parent' => $parent, 'staff' => $staff, 'student' => $student, 'policiesPolicyID' => $policiesPolicyID);
-                    $sql = 'UPDATE policiesPolicy SET name=:name, nameShort=:nameShort, active=:active, category=:category, description=:description, gibbonRoleIDList=:gibbonRoleIDList, parent=:parent, staff=:staff, student=:student WHERE policiesPolicyID=:policiesPolicyID';
+                    $data = array('name' => $name, 'nameShort' => $nameShort, 'active' => $active, 'category' => $category, 'description' => $description, 'gibbonRoleIDList' => $gibbonRoleIDList, 'parent' => $parent, 'staff' => $staff, 'student' => $student, 'location' => $location, 'policiesPolicyID' => $policiesPolicyID);
+                    $sql = 'UPDATE policiesPolicy SET name=:name, nameShort=:nameShort, active=:active, category=:category, description=:description, gibbonRoleIDList=:gibbonRoleIDList, parent=:parent, staff=:staff, student=:student, location=:location WHERE policiesPolicyID=:policiesPolicyID';
                     $result = $connection2->prepare($sql);
                     $result->execute($data);
                 } catch (PDOException $e) {
