@@ -17,6 +17,8 @@ You should have received a copy of the GNU General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
+use Gibbon\Forms\Form;
+
 //Module includes
 include './modules/Policies/moduleFunctions.php';
 
@@ -45,257 +47,80 @@ if (isActionAccessible($guid, $connection2, '/modules/Policies/policies_manage_a
         echo '</div>';
     }
 
-    ?>
-	<form method="post" action="<?php echo $_SESSION[$guid]['absoluteURL'].'/modules/Policies/policies_manage_addProcess.php?search='.$_GET['search'] ?>" enctype="multipart/form-data">
-		<table class='smallIntBorder' cellspacing='0' style="width: 100%">
-			<tr>
-				<td>
-					<b>Scope *</b><br/>
-					<span style="font-size: 90%"><i></i></span>
-				</td>
-				<td class="right">
-					<select name="scope" id="scope" style="width: 302px">
-						<option value="Please select...">Please select...</option>
-						<option value="School">School</option>
-						<option value="Department">Department</option>
-					</select>
-					<script type="text/javascript">
-						var scope=new LiveValidation('scope');
-						scope.add(Validate.Exclusion, { within: ['Please select...'], failureMessage: "Select something!"});
-					 </script>
-				</td>
-			</tr>
+    $form = Form::create('action', $_SESSION[$guid]['absoluteURL'].'/modules/Policies/policies_manage_addProcess.php?search='.$_GET['search']);
+        
+    $form->addHiddenValue('address', $_SESSION[$guid]['address']);
 
-			<script type="text/javascript">
-				$(document).ready(function(){
-					$("#learningAreaRow").css("display","none");
+    $scopes = array(
+        'School' => __('School'),
+        'Department' => __('Department'),
+    );
 
-					$("#scope").change(function(){
-						if ($('#scope option:selected').val() == "Department" ) {
-							$("#learningAreaRow").slideDown("fast", $("#learningAreaRow").css("display","table-row")); //Slide Down Effect
-							gibbonDepartmentID.enable();
-						}
-						else {
-							$("#learningAreaRow").css("display","none");
-							gibbonDepartmentID.disable();
-						}
-					 });
-				});
-			</script>
-			<tr id='learningAreaRow'>
-				<td>
-					<b>Department *</b><br/>
-					<span style="font-size: 90%"><i></i></span>
-				</td>
-				<td class="right">
-					<?php
-                    try {
-                        $dataSelect = array();
-                        $sqlSelect = 'SELECT * FROM gibbonDepartment ORDER BY name';
-                        $resultSelect = $connection2->prepare($sqlSelect);
-                        $resultSelect->execute($dataSelect);
-                    } catch (PDOException $e) {
-                    }
-    				?>
-					<select name="gibbonDepartmentID" id="gibbonDepartmentID" style="width: 302px">
-						<option value="Please select...">Please select...</option>
-						<?php
-                        while ($rowSelect = $resultSelect->fetch()) {
-                            echo "<option value='".$rowSelect['gibbonDepartmentID']."'>".$rowSelect['name'].'</option>';
-                        }
-   						?>
-					</select>
-					<script type="text/javascript">
-						var gibbonDepartmentID=new LiveValidation('gibbonDepartmentID');
-						gibbonDepartmentID.add(Validate.Exclusion, { within: ['Please select...'], failureMessage: "Select something!"});
-					</script>
-				</td>
-			</tr>
-			<tr>
-				<td>
-					<b>Name *</b><br/>
-				</td>
-				<td class="right">
-					<input name="name" id="name" maxlength=100 value="" type="text" style="width: 300px">
-					<script type="text/javascript">
-						var name=new LiveValidation('name');
-						name.add(Validate.Presence);
-					</script>
-				</td>
-			</tr>
-			<tr>
-				<td>
-					<b>Name Short *</b><br/>
-				</td>
-				<td class="right">
-					<input name="nameShort" id="nameShort" maxlength=14 value="" type="text" style="width: 300px">
-					<script type="text/javascript">
-						var nameShort=new LiveValidation('nameShort');
-						nameShort.add(Validate.Presence);
-					</script>
-				</td>
-			</tr>
-			<tr>
-				<td>
-					<b>Active *</b><br/>
-					<span style="font-size: 90%"><i></i></span>
-				</td>
-				<td class="right">
-					<select name="active" id="active" style="width: 302px">
-						<option value="Y">Y</option>
-						<option value="N">N</option>
-					</select>
-				</td>
-			</tr>
-			<tr>
-				<td>
-					<b>Category</b><br/>
-				</td>
-				<td class="right">
-					<input name="category" id="category" maxlength=50 value="" type="text" style="width: 300px">
-					<script type="text/javascript">
-						$(function() {
-							var availableTags=[
-								<?php
-                                try {
-                                    $dataAuto = array();
-                                    $sqlAuto = 'SELECT DISTINCT category FROM policiesPolicy ORDER BY category';
-                                    $resultAuto = $connection2->prepare($sqlAuto);
-                                    $resultAuto->execute($dataAuto);
-                                } catch (PDOException $e) {
-                                }
+    $row = $form->addRow();
+        $row->addLabel('scope', 'Scope');
+        $row->addSelect('scope')->fromArray($scopes)->isRequired()->placeholder();
 
-								while ($rowAuto = $resultAuto->fetch()) {
-									echo '"'.$rowAuto['category'].'", ';
-								}
-								?>
-							];
-							$( "#category" ).autocomplete({source: availableTags});
-						});
-					</script>
-				</td>
-			</tr>
-			<tr>
-				<td>
-					<b>Description</b><br/>
-				</td>
-				<td class="right">
-					<textarea name='description' id='description' rows=5 style='width: 300px'></textarea>
-				</td>
-			</tr>
-			<tr>
-				<td>
-					<b>Type *</b><br/>
-				</td>
-				<td class="right">
-					<input checked type="radio" id="type" name="type" class="type" value="Link" /> Link
-					<input type="radio" id="type" name="type" class="type" value="File" /> File
-				</td>
-			</tr>
-			<script type="text/javascript">
-				/* Subbmission type control */
-				$(document).ready(function() {
-					$("#fileRow").css("display","none");
-					$("#linkRow").slideDown("fast", $("#linkRow").css("display","table-row")); //Slide Down Effect
+    $form->toggleVisibilityByClass('departmentRow')->onSelect('scope')->when('Department');
 
-					$(".type").click(function(){
-						if ($('input[name=type]:checked').val() == "Link" ) {
-							$("#fileRow").css("display","none");
-							$("#linkRow").slideDown("fast", $("#linkRow").css("display","table-row")); //Slide Down Effect
-						} else {
-							$("#linkRow").css("display","none");
-							$("#fileRow").slideDown("fast", $("#fileRow").css("display","table-row")); //Slide Down Effect
-						}
-					 });
-				});
-			</script>
+    $sql = "SELECT gibbonDepartmentID as value, name FROM gibbonDepartment ORDER BY name";
+    $row = $form->addRow()->addClass('departmentRow');
+        $row->addLabel('gibbonDepartmentID', __('Department'));
+        $row->addSelect('gibbonDepartmentID')->fromQuery($pdo, $sql)->isRequired()->placeholder();
 
-			<tr id="fileRow">
-				<td>
-					<b>Policy File *</b><br/>
-				</td>
-				<td class="right">
-					<input type="file" name="file" id="file"><br/><br/>
-					<?php
-                    echo getMaxUpload($guid);
+    $row = $form->addRow();
+        $row->addLabel('name', __('Name'));
+        $row->addTextField('name')->maxLength(100)->isRequired();
 
-                    //Get list of acceptable file extensions
-                    try {
-                        $dataExt = array();
-                        $sqlExt = 'SELECT * FROM gibbonFileExtension';
-                        $resultExt = $connection2->prepare($sqlExt);
-                        $resultExt->execute($dataExt);
-                    } catch (PDOException $e) {
-                    }
-					$ext = '';
-					while ($rowExt = $resultExt->fetch()) {
-						$ext = $ext."'.".$rowExt['extension']."',";
-					}
-					?>
-					<script type="text/javascript">
-						var file=new LiveValidation('file');
-						file.add( Validate.Inclusion, { within: [<?php echo $ext; ?>], failureMessage: "Illegal file type!", partialMatch: true, caseSensitive: false } );
-					</script>
-				</td>
-			</tr>
-			<tr id="linkRow">
-				<td>
-					<b>Policy Link *</b><br/>
-				</td>
-				<td class="right">
-					<input name="link" id="link" maxlength=255 value="" type="text" style="width: 300px">
-					<script type="text/javascript">
-						var link=new LiveValidation('link');
-						link.add( Validate.Inclusion, { within: ['http://', 'https://'], failureMessage: "Address must start with http:// or https://", partialMatch: true } );
-					</script>
-				</td>
-			</tr>
-            <tr>
-                <td>
-                    <b>Audience By Role Category </b><br/>
-                    <span style="font-size: 90%"><i>User role categories who should have view access.<br/></i></span>
-                </td>
-                <td class="right">
-                    Parents <input type='checkbox' name='parent' value='Y'><br/>
-                    Staff <input type='checkbox' name='staff' value='Y'><br/>
-                    Students <input type='checkbox' name='student' value='Y'><br/>
-                </td>
-            </tr>
-			<tr>
-				<td>
-					<b>Audience By Role</b><br/>
-					<span style="font-size: 90%"><i>User role groups who should have view access.<br/></i></span>
-				</td>
-				<td class="right">
-					<?php
-                    $roleCount = 0;
-					try {
-						$dataRoles = array();
-						$sqlRoles = 'SELECT * FROM gibbonRole ORDER BY name';
-						$resultRoles = $connection2->prepare($sqlRoles);
-						$resultRoles->execute($dataRoles);
-					} catch (PDOException $e) {
-					}
-					while ($rowRoles = $resultRoles->fetch()) {
-						echo $rowRoles['name']." <input type='checkbox' name='gibbonRoleID$roleCount' value='".$rowRoles['gibbonRoleID']."'><br/>";
-						++$roleCount;
-					}
-					?>
-					<input type="hidden" name="roleCount" value="<?php echo $roleCount ?>">
-				</td>
-			</tr>
-			<tr>
-				<td>
-					<span style="font-size: 90%"><i>* denotes a required field</i></span>
-				</td>
-				<td class="right">
-					<input type="hidden" name="address" value="<?php echo $_SESSION[$guid]['address'] ?>">
-					<input type="submit" value="Submit">
-				</td>
-			</tr>
-		</table>
-	</form>
-	<?php
+    $row = $form->addRow();
+        $row->addLabel('nameShort', __('Short Name'));
+        $row->addTextField('nameShort')->maxLength(14)->isRequired();
 
+    $row = $form->addRow();
+        $row->addLabel('active', __('Active'));
+        $row->addYesNo('active')->isRequired();
+
+    $sql = "SELECT DISTINCT category FROM policiesPolicy ORDER BY category";
+    $result = $pdo->executeQuery(array(), $sql);
+    $categories = ($result->rowCount() > 0)? $result->fetchAll(\PDO::FETCH_COLUMN, 0) : array();
+
+    $row = $form->addRow();
+        $row->addLabel('category', __('Category'));
+        $row->addTextField('category')->maxLength(100)->autocomplete($categories);
+
+    $row = $form->addRow();
+        $row->addLabel('description', __('Description'));
+        $row->addTextArea('description')->setRows(5);
+
+    $types = array('Link' => __('Link'), 'File' => __('File'));
+    $row = $form->addRow();
+        $row->addLabel('type', __('Type'));
+        $row->addRadio('type')->fromArray($types)->isRequired()->inline();
+
+    // File
+    $form->toggleVisibilityByClass('policyFile')->onRadio('type')->when('File');
+    $row = $form->addRow()->addClass('policyFile');
+        $row->addLabel('file', __('Policy File'));
+        $row->addFileUpload('file')->isRequired();
+
+    // Link
+    $form->toggleVisibilityByClass('policyLink')->onRadio('type')->when('Link');
+    $row = $form->addRow()->addClass('policyLink');
+        $row->addLabel('link', __('Policy Link'));
+        $row->addURL('link')->maxLength(255)->isRequired();
+
+    $sql = "SELECT DISTINCT LOWER(category) as value, category as name FROM gibbonRole";
+    $row = $form->addRow();
+        $row->addLabel('roleCategories', __('Audience By Role Category'))->description(__('User role categories who should have view access.'));
+        $row->addCheckbox('roleCategories')->fromQuery($pdo, $sql);
+
+    $sql = "SELECT gibbonRoleID as value, name FROM gibbonRole ORDER BY name";
+    $row = $form->addRow();
+        $row->addLabel('gibbonRoleIDList', __('Audience By Role'))->description(__('User role groups who should have view access.'));
+        $row->addCheckbox('gibbonRoleIDList')->fromQuery($pdo, $sql);
+
+    $row = $form->addRow();
+        $row->addFooter();
+        $row->addSubmit();
+
+    echo $form->getOutput();
 }
-?>

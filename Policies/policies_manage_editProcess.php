@@ -63,37 +63,40 @@ if (isActionAccessible($guid, $connection2, '/modules/Policies/policies_manage_e
             $description = $_POST['description'];
             $location = $row['location'];
             if ($row['type'] == 'Link' && !empty($_POST['link'])) {
-                $location = $_POST['link'] ;
+                $location = isset($_POST['link'])? $_POST['link'] : '';
+            } else if ($row['type'] == 'File') {
+                $location = isset($_POST['attachment'])? $_POST['attachment'] : '';
             }
-            $gibbonRoleIDList = '';
-            for ($i = 0; $i < $_POST['roleCount']; ++$i) {
-                if (isset($_POST['gibbonRoleID'.$i])) {
-                    if ($_POST['gibbonRoleID'.$i] != '') {
-                        $gibbonRoleIDList .= $_POST['gibbonRoleID'.$i].',';
-                    }
-                }
-            }
-            if (substr($gibbonRoleIDList, -1) == ',') {
-                $gibbonRoleIDList = substr($gibbonRoleIDList, 0, -1);
-            }
-            $parent = 'N';
-            if (isset($_POST['parent']) && $_POST['parent'] == 'Y') {
-                $parent = 'Y';
-            }
-            $staff = 'N';
-            if (isset($_POST['staff']) && $_POST['staff'] == 'Y') {
-                $staff = 'Y';
-            }
-            $student = 'N';
-            if (isset($_POST['student']) && $_POST['student'] == 'Y') {
-                $student = 'Y';
-            }
+            $gibbonRoleIDList = isset($_POST['gibbonRoleIDList'])? $_POST['gibbonRoleIDList'] : array();
+            $gibbonRoleIDList = implode(',', $gibbonRoleIDList);
+
+            $roleCategories = isset($_POST['roleCategories'])? $_POST['roleCategories'] : array();
+            $staff = in_array('staff', $roleCategories)? 'Y' : 'N';
+            $student = in_array('student', $roleCategories)? 'Y' : 'N';
+            $parent = in_array('parent', $roleCategories)? 'Y' : 'N';
 
             if ($name == '' or $nameShort == '' or $active == '') {
                 //Fail 3
                 $URL = $URL.'&return=error3';
                 header("Location: {$URL}");
             } else {
+
+                if (!empty($_FILES['file']['tmp_name'])) {
+                    $fileUploader = new Gibbon\FileUploader($pdo, $gibbon->session);
+
+                    $file = (isset($_FILES['file']))? $_FILES['file'] : null;
+
+                    // Upload the file, return the /uploads relative path
+                    $location = $fileUploader->uploadFromPost($file, 'policy_');
+
+                    if (empty($location)) {
+                        //Fail 5
+                        $URL = $URL.'&return=error5';
+                        header("Location: {$URL}");
+                        exit;
+                    }
+                }
+
                 //Write to database
                 try {
                     $data = array('name' => $name, 'nameShort' => $nameShort, 'active' => $active, 'category' => $category, 'description' => $description, 'gibbonRoleIDList' => $gibbonRoleIDList, 'parent' => $parent, 'staff' => $staff, 'student' => $student, 'location' => $location, 'policiesPolicyID' => $policiesPolicyID);

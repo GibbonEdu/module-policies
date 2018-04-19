@@ -17,6 +17,8 @@ You should have received a copy of the GNU General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
+use Gibbon\Forms\Prefab\DeleteForm;
+
 //Module includes
 include './modules/Policies/moduleFunctions.php';
 
@@ -63,33 +65,9 @@ if (isActionAccessible($guid, $connection2, '/modules/Policies/policies_manage_d
                 echo "<a href='".$_SESSION[$guid]['absoluteURL'].'/index.php?q=/modules/Policies/policies_manage.php&search='.$_GET['search']."'>Back to Search Results</a>";
                 echo '</div>';
             }
-            ?>
-			<form method="post" action="<?php echo $_SESSION[$guid]['absoluteURL']."/modules/Policies/policies_manage_deleteProcess.php?policiesPolicyID=$policiesPolicyID&search=".$_GET['search'] ?>">
-				<table class='smallIntBorder' cellspacing='0' style="width: 100%">
-					<tr>
-						<td>
-							<b>Are you sure you want to delete "<?php echo $row['name'] ?>" from Policies?</b><br/>
-							<span style="font-size: 90%; color: #cc0000"><i>This operation cannot be undone, and may lead to loss of vital data in your system.<br/>PROCEED WITH CAUTION!</i></span>
-						</td>
-						<td class="right">
 
-						</td>
-					</tr>
-					<tr>
-						<td>
-							<input name="policiesPolicyID" id="policiesPolicyID" value="<?php echo $policiesPolicyID ?>" type="hidden">
-							<input type="hidden" name="address" value="<?php echo $_SESSION[$guid]['address'] ?>">
-							<input type="submit" value="Yes">
-						</td>
-						<td class="right">
-
-						</td>
-					</tr>
-				</table>
-			</form>
-			<?php
-
+            $form = DeleteForm::createForm($_SESSION[$guid]['absoluteURL']."/modules/Policies/policies_manage_deleteProcess.php?policiesPolicyID=$policiesPolicyID&search=".$_GET['search']);
+            echo $form->getOutput();
         }
     }
 }
-?>

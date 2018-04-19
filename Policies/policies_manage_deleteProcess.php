@@ -21,7 +21,7 @@ include '../../gibbon.php';
 
 include './moduleFunctions.php';
 
-$policiesPolicyID = $_POST['policiesPolicyID'];
+$policiesPolicyID = $_GET['policiesPolicyID'];
 $URL = $_SESSION[$guid]['absoluteURL'].'/index.php?q=/modules/'.getModuleName($_POST['address'])."/policies_manage_delete.php&policiesPolicyID=$policiesPolicyID&search=".$_GET['search'];
 $URLDelete = $_SESSION[$guid]['absoluteURL'].'/index.php?q=/modules/'.getModuleName($_POST['address']).'/policies_manage.php&search='.$_GET['search'];
 

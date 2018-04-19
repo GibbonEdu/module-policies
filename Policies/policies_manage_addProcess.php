@@ -40,30 +40,15 @@ if (isActionAccessible($guid, $connection2, '/modules/Policies/policies_manage_a
     $category = $_POST['category'];
     $description = $_POST['description'];
     $type = $_POST['type'];
-    $link = $_POST['link'];
-    $gibbonRoleIDList = '';
-    for ($i = 0; $i < $_POST['roleCount']; ++$i) {
-        if (isset($_POST['gibbonRoleID'.$i])) {
-            if ($_POST['gibbonRoleID'.$i] != '') {
-                $gibbonRoleIDList .= $_POST['gibbonRoleID'.$i].',';
-            }
-        }
-    }
-    if (substr($gibbonRoleIDList, -1) == ',') {
-        $gibbonRoleIDList = substr($gibbonRoleIDList, 0, -1);
-    }
-    $parent = 'N';
-    if (isset($_POST['parent']) && $_POST['parent'] == 'Y') {
-        $parent = 'Y';
-    }
-    $staff = 'N';
-    if (isset($_POST['staff']) && $_POST['staff'] == 'Y') {
-        $staff = 'Y';
-    }
-    $student = 'N';
-    if (isset($_POST['student']) && $_POST['student'] == 'Y') {
-        $student = 'Y';
-    }
+    $link = isset($_POST['link'])? $_POST['link'] : '';
+    
+    $gibbonRoleIDList = isset($_POST['gibbonRoleIDList'])? $_POST['gibbonRoleIDList'] : array();
+    $gibbonRoleIDList = implode(',', $gibbonRoleIDList);
+
+    $roleCategories = isset($_POST['roleCategories'])? $_POST['roleCategories'] : array();
+    $staff = in_array('staff', $roleCategories)? 'Y' : 'N';
+    $student = in_array('student', $roleCategories)? 'Y' : 'N';
+    $parent = in_array('parent', $roleCategories)? 'Y' : 'N';
 
     if ($scope == '' or ($scope == 'Department' and is_null($gibbonDepartmentID)) or $name == '' or $nameShort == '' or $active == '' or $type == '' or ($type == 'Link' and $link == '')) {
         //Fail 3
