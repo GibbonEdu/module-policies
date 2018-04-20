@@ -17,7 +17,7 @@ You should have received a copy of the GNU General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-@session_start();
+use Gibbon\Forms\Form;
 
 //Module includes
 include './modules/Policies/moduleFunctions.php';
@@ -65,37 +65,22 @@ if (isActionAccessible($guid, $connection2, '/modules/Policies/policies_view.php
 
         if ($highestAction == 'View Policies_all') {
             echo "<h3 class='top'>";
-            echo 'Filters';
+            echo __('Filters');
             echo '</h3>';
-            ?>
-			<form method="get" action="<?php echo $_SESSION[$guid]['absoluteURL']?>/index.php">
-				<table class='smallIntBorder' cellspacing='0' style="width: 100%">
-					<tr>
-						<td>
-							<b>All Policies</b><br/>
-							<span style="font-size: 90%"><i>Override audience to reveal all policies.</i></span>
-						</td>
-						<td class="right">
-							<?php
-                            $checked = '';
-							if ($allPolicies == 'on') {
-								$checked = 'checked';
-							}
-							echo "<input $checked name=\"allPolicies\" id=\"allPolicies\" type=\"checkbox\">";
-							?>
-						</td>
-					</tr>
-					<tr>
-						<td colspan=2 class="right">
-							<input type="hidden" name="q" value="/modules/<?php echo $_SESSION[$guid]['module'] ?>/policies_view.php">
-							<input type="hidden" name="address" value="<?php echo $_SESSION[$guid]['address'] ?>">
-							<input type="submit" value="Submit">
-						</td>
-					</tr>
-				</table>
-			</form>
-			<?php
 
+            $form = Form::create('search', $_SESSION[$guid]['absoluteURL'].'/index.php', 'get');
+            $form->setClass('noIntBorder fullWidth');
+
+            $form->addHiddenValue('q', '/modules/'.$_SESSION[$guid]['module'].'/policies_view.php');
+
+            $row = $form->addRow();
+                $row->addLabel('allPolicies', __('All Policies'))->description(__('Override audience to reveal all policies.'));
+                $row->addCheckbox('allPolicies')->checked($allPolicies);
+
+            $row = $form->addRow();
+                $row->addSearchSubmit($gibbon->session, __('Clear Filters'));
+
+            echo $form->getOutput();
         }
 
         try {
@@ -117,7 +102,7 @@ if (isActionAccessible($guid, $connection2, '/modules/Policies/policies_view.php
                     $idWhere .= ")";
                 }
 
-                $sql = "SELECT policiesPolicy.*, gibbonDepartment.name AS department, gibbonPerson.surname, gibbonPerson.preferredName, gibbonPerson.title FROM policiesPolicy JOIN gibbonPerson ON (policiesPolicy.gibbonPersonIDCreator=gibbonPerson.gibbonPersonID) LEFT JOIN gibbonDepartment ON (policiesPolicy.gibbonDepartmentID=gibbonDepartment.gibbonDepartmentID) WHERE $idWhere ORDER BY scope, gibbonDepartment.name, category, policiesPolicy.name";
+                $sql = "SELECT policiesPolicy.*, gibbonDepartment.name AS department, gibbonPerson.surname, gibbonPerson.preferredName, gibbonPerson.title FROM policiesPolicy JOIN gibbonPerson ON (policiesPolicy.gibbonPersonIDCreator=gibbonPerson.gibbonPersonID) LEFT JOIN gibbonDepartment ON (policiesPolicy.gibbonDepartmentID=gibbonDepartment.gibbonDepartmentID) WHERE $idWhere AND active='Y' ORDER BY scope, gibbonDepartment.name, category, policiesPolicy.name";
             }
             $result = $connection2->prepare($sql);
             $result->execute($data);
