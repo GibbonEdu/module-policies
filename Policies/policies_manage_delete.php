@@ -60,12 +60,6 @@ if (isActionAccessible($guid, $connection2, '/modules/Policies/policies_manage_d
             //Let's go!
             $row = $result->fetch();
 
-            if ($_GET['search'] != '') {
-                echo "<div class='linkTop'>";
-                echo "<a href='".$_SESSION[$guid]['absoluteURL'].'/index.php?q=/modules/Policies/policies_manage.php&search='.$_GET['search']."'>Back to Search Results</a>";
-                echo '</div>';
-            }
-
             $form = DeleteForm::createForm($_SESSION[$guid]['absoluteURL']."/modules/Policies/policies_manage_deleteProcess.php?policiesPolicyID=$policiesPolicyID&search=".$_GET['search']);
             echo $form->getOutput();
         }

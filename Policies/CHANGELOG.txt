@@ -1,8 +1,12 @@
 CHANGELOG
 =========
+v1.2.00
+-------
+Object oriented rewrite and code cleanup
+
 v1.1.02
 -------
-Added editing of policy links 
+Added editing of policy links
 
 v1.1.01
 -------
