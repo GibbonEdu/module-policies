@@ -25,7 +25,7 @@ $description = 'A place to store, share and view school policies, either as file
 $entryURL = 'policies_view.php';
 $type = 'Additional';
 $category = 'Other';
-$version = '1.2.00';
+$version = '1.3.00';
 $author = 'Ross Parker';
 $url = 'http://rossparker.org';
 
@@ -48,7 +48,7 @@ $moduleTables[0] = "CREATE TABLE `policiesPolicy` (
   `gibbonPersonIDCreator` int(8) unsigned zerofill NOT NULL,
   `timestampCreated` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
   PRIMARY KEY (`policiesPolicyID`)
-) ENGINE=MyISAM DEFAULT CHARSET=utf8 ;";
+) ENGINE=InnoDB DEFAULT CHARSET=utf8 ;";
 
 //Action rows
 $actionRows[0]['name'] = 'View Policies_byRole';
