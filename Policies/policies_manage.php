@@ -1,65 +1,46 @@
 <?php
+
 /*
-Gibbon, Flexible & Open School System
-Copyright (C) 2010, Ross Parker
+  Gibbon, Flexible & Open School System
+  Copyright (C) 2010, Ross Parker
 
-This program is free software: you can redistribute it and/or modify
-it under the terms of the GNU General Public License as published by
-the Free Software Foundation, either version 3 of the License, or
-(at your option) any later version.
+  This program is free software: you can redistribute it and/or modify
+  it under the terms of the GNU General Public License as published by
+  the Free Software Foundation, either version 3 of the License, or
+  (at your option) any later version.
 
-This program is distributed in the hope that it will be useful,
-but WITHOUT ANY WARRANTY; without even the implied warranty of
-MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-GNU General Public License for more details.
+  This program is distributed in the hope that it will be useful,
+  but WITHOUT ANY WARRANTY; without even the implied warranty of
+  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+  GNU General Public License for more details.
 
-You should have received a copy of the GNU General Public License
-along with this program.  If not, see <http://www.gnu.org/licenses/>.
-*/
+  You should have received a copy of the GNU General Public License
+  along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ */
 
 use Gibbon\Forms\Form;
+use Gibbon\Services\Format;
+use Gibbon\Tables\DataTable;
+use Gibbon\Domain\User\RoleGateway;
+use Gibbon\Module\Policies\PoliciesGateway;
 
 //Module includes
 include './modules/Policies/moduleFunctions.php';
 
 if (isActionAccessible($guid, $connection2, '/modules/Policies/policies_manage.php') == false) {
-
     //Acess denied
     echo "<div class='error'>";
     echo 'You do not have access to this action.';
     echo '</div>';
 } else {
-    echo "<div class='trail'>";
-    echo "<div class='trailHead'><a href='".$_SESSION[$guid]['absoluteURL']."'>Home</a> > <a href='".$_SESSION[$guid]['absoluteURL'].'/index.php?q=/modules/'.getModuleName($_GET['q']).'/'.getModuleEntry($_GET['q'], $connection2, $guid)."'>".getModuleName($_GET['q'])."</a> > </div><div class='trailEnd'>Manage Policies</div>";
-    echo '</div>';
+    // Proceed!
+    $page->breadcrumbs->add(__('Manage Policies'));
 
     if (isset($_GET['return'])) {
         returnProcess($guid, $_GET['return'], null, null);
     }
 
-    //Set pagination variable
-    $page = null;
-    if (isset($_GET['page'])) {
-        $page = $_GET['page'];
-    }
-    if ((!is_numeric($page)) or $page < 1) {
-        $page = 1;
-    }
-
-    //Build role lookup array
-    $allRoles = array();
-    try {
-        $dataRoles = array();
-        $sqlRoles = 'SELECT * FROM gibbonRole';
-        $resultRoles = $connection2->prepare($sqlRoles);
-        $resultRoles->execute($dataRoles);
-    } catch (PDOException $e) {
-    }
-    while ($rowRoles = $resultRoles->fetch()) {
-        $allRoles[$rowRoles['gibbonRoleID']] = $rowRoles['name'];
-    }
-
-    $search = isset($_GET['search'])? $_GET['search'] : '';
+    $search = $_GET['search'] ?? '';
 
     echo "<h2 class='top'>";
     echo __('Search');
@@ -71,150 +52,117 @@ if (isActionAccessible($guid, $connection2, '/modules/Policies/policies_manage.p
     $form->addHiddenValue('q', '/modules/'.$_SESSION[$guid]['module'].'/policies_manage.php');
 
     $row = $form->addRow();
-        $row->addLabel('search', __('Search For'))->description(__('Name, Short Name, Category, Department.'));
-        $row->addTextField('search')->setValue($search);
+    $row->addLabel('search', __('Search For'))->description(__('Name, Short Name, Category, Department.'));
+    $row->addTextField('search')->setValue($search);
 
     $row = $form->addRow();
-        $row->addSearchSubmit($gibbon->session, __('Clear Search'));
+    $row->addSearchSubmit($gibbon->session, __('Clear Search'));
 
     echo $form->getOutput();
 
-    echo "<h2 class='top'>";
-    echo __('View');
-    echo '</h2>';
-
     try {
-        $data = array();
-        $sql = 'SELECT policiesPolicy.*, gibbonDepartment.name AS department FROM policiesPolicy LEFT JOIN gibbonDepartment ON (policiesPolicy.gibbonDepartmentID=gibbonDepartment.gibbonDepartmentID) ORDER BY scope, gibbonDepartment.name, category, policiesPolicy.name';
-        if ($search != '') {
-            $data = array('search1' => "%$search%", 'search2' => "%$search%", 'search3' => "%$search%", 'search4' => "%$search%");
-            $sql = 'SELECT policiesPolicy.*, gibbonDepartment.name AS department FROM policiesPolicy LEFT JOIN gibbonDepartment ON (policiesPolicy.gibbonDepartmentID=gibbonDepartment.gibbonDepartmentID) WHERE (policiesPolicy.name LIKE :search1 OR policiesPolicy.nameShort LIKE :search2 OR policiesPolicy.category LIKE :search3  OR gibbonDepartment.name LIKE :search4) ORDER BY scope, gibbonDepartment.name, category, policiesPolicy.name';
-        }
-        $sqlPage = $sql.' LIMIT '.$_SESSION[$guid]['pagination'].' OFFSET '.(($page - 1) * $_SESSION[$guid]['pagination']);
-        $result = $connection2->prepare($sql);
-        $result->execute($data);
-    } catch (PDOException $e) { echo "<div class='error'>".$e->getMessage().'</div>';
-    }
 
-    echo "<div class='linkTop'>";
-    echo "<a href='".$_SESSION[$guid]['absoluteURL']."/index.php?q=/modules/Policies/policies_manage_add.php&search=$search'><img title='New' src='./themes/".$_SESSION[$guid]['gibbonThemeName']."/img/page_new.png'/></a>";
-    echo '</div>';
+        $roleGateway = $container->get(RoleGateway::class);
+        $criteriaRole = $roleGateway->newQueryCriteria();
 
-    if ($result->rowCount() < 1) { echo "<div class='error'>";
-        echo 'There are no policies to display.';
-        echo '</div>';
-    } else {
-        if ($result->rowCount() > $_SESSION[$guid]['pagination']) {
-            printPagination($guid, $result->rowCount(), $page, $_SESSION[$guid]['pagination'], 'top', "search=$search");
-        }
+        $policiesGateway = $container->get(PoliciesGateway::class);
+        $criteriaPolicies = $policiesGateway->newQueryCriteria();
 
-        echo "<table cellspacing='0' style='width: 100%'>";
-        echo "<tr class='head'>";
-        echo '<th>';
-        echo "Name<br/><span style='font-style: italic; font-size: 85%'>Short Name</span>";
-        echo '</th>';
-        echo '<th>';
-        echo "Scope<br/><span style='font-style: italic; font-size: 85%'>Department</span>";
-        echo '</th>';
-        echo '<th>';
-        echo 'Category';
-        echo '</th>';
-        echo '<th>';
-        echo 'Audience';
-        echo '</th>';
-        echo "<th style='width: 120px'>";
-        echo 'Actions';
-        echo '</th>';
-        echo '</tr>';
+        $policies = $policiesGateway->queryPolicies($criteriaPolicies, $search);
 
-        $count = 0;
-        $rowNum = 'odd';
-        try {
-            $resultPage = $connection2->prepare($sqlPage);
-            $resultPage->execute($data);
-        } catch (PDOException $e) {
-            echo "<div class='error'>".$e->getMessage().'</div>';
-        }
-        while ($row = $resultPage->fetch()) {
-            if ($count % 2 == 0) {
-                $rowNum = 'even';
-            } else {
-                $rowNum = 'odd';
+        $table = DataTable::createPaginated('policies', $criteriaPolicies);
+        $table->setTitle(__('View'));
+
+        $table->addHeaderAction('add', __('Add'))
+                ->setURL('/modules/Policies/policies_manage_add.php')
+                ->addParam('search', $search);
+
+        $table->modifyRows(function ($policies, $row) {
+            if ($policies['active'] == 'N') {
+                $row->addClass('error');
             }
-            ++$count;
+            return $row;
+        });
 
-            if ($row['active'] == 'N') {
-                $rowNum = 'error';
-            }
+        $table->addColumn('scope', __('Scope'))
+                ->format(function($policies) {
+                    $output = '';
+                    $output .= '<strong>'.__($policies['scope']).'</strong>';
+                    $output .= '<br/>'.Format::small($policies['department']);
+                    return $output;
+                })
+                ->description(__('Department'))
+                ->width('20%');
 
-			//COLOR ROW BY STATUS!
-			echo "<tr class=$rowNum>";
-            echo '<td>';
-            if ($row['type'] == 'File') {
-                echo "<a style='font-weight: bold' href='".$_SESSION[$guid]['absoluteURL'].'/'.$row['location']."'>".$row['name'].'</a><br/>';
-            } elseif ($row['type'] == 'Link') {
-                echo "<a style='font-weight: bold' target='_blank' href='".$row['location']."'>".$row['name'].'</a><br/>';
-            }
-            echo "<span style='font-style: italic; font-size: 85%'>".$row['nameShort'].'</span>';
-            echo '</td>';
-            echo '<td>';
-            echo '<b>'.$row['scope'].'</b><br/>';
-            echo "<span style='font-style: italic; font-size: 85%'>".$row['department'].'</span>';
-            echo '</td>';
-            echo '<td>';
-            echo $row['category'];
-            echo '</td>';
-            echo '<td>';
-            if ($row['gibbonRoleIDList'] == '' && $row['parent'] == 'N' && $row['staff'] == 'N' && $row['student'] == 'N') {
-                echo '<i>No audience set</i>';
-            } else {
-                if ($row['gibbonRoleIDList'] != '') {
-                    $roles = explode(',', $row['gibbonRoleIDList']);
-                    foreach ($roles as $role) {
-                        echo $allRoles[$role].'<br/>';
+        $table->addColumn('name', __('Name'))
+                ->format(function($policies) {
+                    $output = '';
+                    $output .= '<strong>'.Format::link($policies['location'], $policies['name']).'</strong>';
+                    $output .= '<br/>'.Format::small($policies['nameShort']);
+                    return $output;
+                })
+                ->description(__('Name Short'))
+                ->width('30%');
+
+
+        $table->addColumn('category', __('Category'))->width('22%');
+
+        $table->addColumn('audience', __('Audience'))
+                ->format(function($policies) use ($roleGateway) {
+                    $output = '';
+                    if ($policies['gibbonRoleIDList'] == '' && $policies['parent'] == 'N' && $policies['staff'] == 'N' && $policies['student'] == 'N') {
+                        $output .= '<i>'.__('No audience sets').'</i>';
+                    } else {
+                        if ($policies['gibbonRoleIDList'] != '') {
+                            $roles = explode(',', $policies['gibbonRoleIDList']);
+                            foreach ($roles as $role) {
+                                $roleName = $roleGateway->getRoleByID($role);
+                                if ($roleName) {
+                                    $output .= __($roleName['name'])."<br />";
+                                }
+                            }
+                        }
+                        if ($policies['parent'] == 'Y') {
+                            $output .= _('Parents')."<br />";
+                        }
+                        if ($policies['staff'] == 'Y') {
+                            $output .= _('Staff')."<br />";
+                        }
+                        if ($policies['student'] == 'Y') {
+                            $output .= _('Students')."<br />";
+                        }
                     }
-                }
-                if ($row['parent'] == 'Y') {
-                    print "Parents<br/>";
-                }
-                if ($row['staff'] == 'Y') {
-                    print "Staff<br/>";
-                }
-                if ($row['student'] == 'Y') {
-                    print "Students<br/>";
-                }
-            }
-            echo '</td>';
-            echo '<td>';
-            echo "<script type='text/javascript'>";
-            echo '$(document).ready(function(){';
-            echo "\$(\".comment-$count\").hide();";
-            echo "\$(\".show_hide-$count\").fadeIn(1000);";
-            echo "\$(\".show_hide-$count\").click(function(){";
-            echo "\$(\".comment-$count\").fadeToggle(1000);";
-            echo '});';
-            echo '});';
-            echo '</script>';
-            echo "<a href='".$_SESSION[$guid]['absoluteURL'].'/index.php?q=/modules/Policies/policies_manage_edit.php&policiesPolicyID='.$row['policiesPolicyID']."&search=$search'><img title='Edit' src='./themes/".$_SESSION[$guid]['gibbonThemeName']."/img/config.png'/></a> ";
-            echo "<a class='thickbox' href='".$_SESSION[$guid]['absoluteURL'].'/fullscreen.php?q=/modules/Policies/policies_manage_delete.php&policiesPolicyID='.$row['policiesPolicyID']."&search=$search&width=650&height=135'><img title='Delete' src='./themes/".$_SESSION[$guid]['gibbonThemeName']."/img/garbage.png'/></a> ";
-            if ($row['description'] != '') {
-                echo "<a class='show_hide-$count' onclick='false' href='#'><img style='padding-right: 5px' src='".$_SESSION[$guid]['absoluteURL']."/themes/Default/img/page_down.png' title='Show Description' onclick='return false;' /></a>";
-            }
-            echo '</td>';
-            echo '</tr>';
-            if ($row['description'] != '') {
-                echo "<tr class='comment-$count' id='comment-$count'>";
-                echo "<td style='background-color: #fff' colspan=5>";
-                echo $row['description'];
-                echo '</td>';
-                echo '</tr>';
-            }
-        }
-        echo '</table>';
+                    return $output;
+                })
+                ->width('20%');
 
-        if ($result->rowCount() > $_SESSION[$guid]['pagination']) {
-            printPagination($guid, $result->rowCount(), $page, $_SESSION[$guid]['pagination'], 'bottom', "search=$search");
-        }
+
+        $table->addActionColumn()
+                ->addParam('policiesPolicyID')
+                ->addParam('search')
+                ->format(function ($policies, $actions) use ($guid) {
+                    $actions->addAction('edit', __('Edit'))
+                    ->setURL('/modules/Policies/policies_manage_edit.php');
+
+                    $actions->addAction('delete', __('Delete'))
+                    ->setURL('/modules/Policies/policies_manage_delete.php');
+                })
+                ->width('20%');
+
+        $table->addExpandableColumn('description')
+                ->format(function($policies) {
+                    $output = '';
+                    if (!empty($policies['description'])) {
+                        $output .= '<strong>'.__('Description').'</strong>:';
+                        $output .= '<br />'.$policies['description'];
+                    }
+                    return $output;
+                })
+                ->width('10%');
+
+        echo $table->render($policies);
+    } catch (Exception $e) {
+        echo "<div class='error'>".$e->getMessage().'</div>';
     }
 }
 ?>
