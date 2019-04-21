@@ -42,9 +42,6 @@ if (isActionAccessible($guid, $connection2, '/modules/Policies/policies_view.php
         $page->breadcrumbs->add(__('View Policies'));
 
         $allPolicies = '';
-        if (isset($_GET['allPolicies'])) {
-            $allPolicies = $_GET['allPolicies'];
-        }
 
         if ($highestAction == 'View Policies_all') {
             echo '<p>'.__('On this page you can see all policies for which you are a member of the designated audience. To view a policy, click on its name in the left-hand column below. As a privileged user, you can also override audience restrictions, and view all policies.').'</p>';
@@ -53,122 +50,109 @@ if (isActionAccessible($guid, $connection2, '/modules/Policies/policies_view.php
         }
 
         if ($highestAction == 'View Policies_all') {
-            echo "<h3 class='top'>";
-            echo __('Filters');
-            echo '</h3>';
+            $allPolicies = $_GET['allPolicies'] ?? '';
 
             $form = Form::create('search', $_SESSION[$guid]['absoluteURL'] . '/index.php', 'get');
+            $form->setTitle(__('Filters'));
             $form->setClass('noIntBorder fullWidth');
 
             $form->addHiddenValue('q', '/modules/' . $_SESSION[$guid]['module'] . '/policies_view.php');
 
             $row = $form->addRow();
-            $row->addLabel('allPolicies', __('All Policies'))->description(__('Override audience to reveal all policies.'));
-            $row->addCheckbox('allPolicies')->checked($allPolicies);
+                $row->addLabel('allPolicies', __('All Policies'))->description(__('Override audience to reveal all policies.'));
+                $row->addCheckbox('allPolicies')->checked($allPolicies);
 
             $row = $form->addRow();
-            $row->addSearchSubmit($gibbon->session, __('Clear Filters'));
+                $row->addSearchSubmit($gibbon->session, __('Clear Filters'));
 
             echo $form->getOutput();
         }
 
-        try {
-            
-            $roleGateway = $container->get(RoleGateway::class);
-            $criteriaRole = $roleGateway->newQueryCriteria();
+        $roleGateway = $container->get(RoleGateway::class);
+        $policiesGateway = $container->get(PoliciesGateway::class);
 
-            $policiesGateway = $container->get(PoliciesGateway::class);
-            $criteriaPolicies = $policiesGateway->newQueryCriteria();
-           
-            if ($allPolicies == 'on') {
-                $policies = $policiesGateway->queryViewPoliciesByRole($criteriaPolicies);
-            } else {
-                $policies = $policiesGateway->queryViewPoliciesByRole($criteriaPolicies, $_SESSION[$guid]['gibbonRoleIDCurrent']);
-            }
-
-        } catch (Exception $e) {
-            echo "<div class='error'>" . $e->getMessage() . '</div>';
-        }
-
-        if (!$policies) {
-            echo '<div class="error">';
-            echo __('There are no policies for you to view');
-            echo '</div>';
+        $criteria = $policiesGateway
+            ->newQueryCriteria()
+            ->sortBy(['scope', 'gibbonDepartment.name', 'category', 'policiesPolicy.name'])
+            ->fromPOST();
+        
+        if ($allPolicies == 'on') {
+            $policies = $policiesGateway->queryViewPoliciesByRole($criteria);
         } else {
-            
-            $table = DataTable::createPaginated('policies', $criteriaPolicies);
-            $table->setTitle(__('View'));
-
-            $table->addColumn('scope', __('Scope'))
-                ->format(function($policies) {
-                    $output = '';
-                    $output .= '<strong>'.__($policies['scope']).'</strong>';
-                    $output .= '<br/>'.Format::small($policies['department']);
-                    return $output;
-                })
-                ->description(__('Department'))
-                ->width('15%');            
-            
-            $table->addColumn('name', __('Name'))
-                    ->format(function($policies) {
-                        $output = '';
-                        $output .= '<strong>' . Format::link($policies['location'], $policies['name']) . '</strong>';
-                        $output .= '<br/>' . Format::small($policies['nameShort']);
-                        return $output;
-                    })
-                    ->description(__('Name Short'))
-                    ->width('25%');
-
-            $table->addColumn('category', __('Category'))->width('18%');
-            
-            $table->addColumn('audience', __('Audience'))
-                    ->format(function($policies) use ($roleGateway) {
-                        $output = '';
-                        if ($policies['gibbonRoleIDList'] == '' && $policies['parent'] == 'N' && $policies['staff'] == 'N' && $policies['student'] == 'N') {
-                             $output .= '<i>' . __('No audience sets') . '</i>';
-                        } else {
-                            if ($policies['gibbonRoleIDList'] != '') {
-                                $roles = explode(',', $policies['gibbonRoleIDList']);
-                                foreach ($roles as $role) {
-                                    $roleName = $roleGateway->getRoleByID($role);
-                                    if ($roleName) {
-                                        $output .= __($roleName['name']) . "<br />";
-                                    }
-                                }
-                            }
-                            if ($policies['parent'] == 'Y') {
-                                $output .= _('Parents') . "<br />";
-                            }
-                            if ($policies['staff'] == 'Y') {
-                                $output .= _('Staff') . "<br />";
-                            }
-                            if ($policies['student'] == 'Y') {
-                                $output .= _('Students') . "<br />";
-                            }
-                        }
-                        return $output;
-                    })
-                    ->width('17%');
-
-            $table->addColumn('create', __('Created By '))
-                    ->format(Format::using('name', ['title', 'preferredName', 'surname', 'Staff']))
-                    ->width('20%');
-                    
-            $table->addExpandableColumn('description')
-                    ->format(function($policies) {
-                        $output = '';
-                        if (!empty($policies['description'])) {
-                            $output .= '<strong>'.__('Description').'</strong>:';
-                            $output .= '<br />'.$policies['description'];
-                        }
-                        return $output;
-                    })
-                    ->width('5%'); 
-                
-
-            echo $table->render($policies);
-            
+            $policies = $policiesGateway->queryViewPoliciesByRole($criteria, $_SESSION[$guid]['gibbonRoleIDCurrent']);
         }
+
+        $table = DataTable::createPaginated('policies', $criteria);
+        $table->setTitle(__('View'));
+
+        $table->addMetaData('blankSlate', __('There are no policies to view.'));
+
+        $table->addExpandableColumn('description')
+            ->format(function ($policies) {
+                $output = '';
+                if (!empty($policies['description'])) {
+                    $output .= '<strong>'.__('Description').'</strong>:';
+                    $output .= '<br />'.$policies['description'];
+                }
+                return $output;
+            })
+            ->width('5%');
+
+        $table->addColumn('scope', __('Scope'))
+            ->format(function ($policies) {
+                $output = '';
+                $output .= '<strong>'.__($policies['scope']).'</strong>';
+                $output .= '<br/>'.Format::small($policies['department']);
+                return $output;
+            })
+            ->description(__('Department'))
+            ->width('15%');
+        
+        $table->addColumn('name', __('Name'))
+            ->format(function ($policies) {
+                $output = '';
+                $output .= '<strong>' . Format::link($policies['location'], $policies['name']) . '</strong>';
+                $output .= '<br/>' . Format::small($policies['nameShort']);
+                return $output;
+            })
+            ->description(__('Name Short'))
+            ->width('25%');
+
+        $table->addColumn('category', __('Category'))->width('18%');
+        
+        $table->addColumn('gibbonRoleIDList', __('Audience'))
+            ->format(function ($policies) use ($roleGateway) {
+                $output = '';
+                if ($policies['gibbonRoleIDList'] == '' && $policies['parent'] == 'N' && $policies['staff'] == 'N' && $policies['student'] == 'N') {
+                    $output .= '<i>' . __('No audience sets') . '</i>';
+                } else {
+                    if ($policies['gibbonRoleIDList'] != '') {
+                        $roles = explode(',', $policies['gibbonRoleIDList']);
+                        foreach ($roles as $role) {
+                            $roleName = $roleGateway->getRoleByID($role);
+                            if ($roleName) {
+                                $output .= __($roleName['name']) . "<br />";
+                            }
+                        }
+                    }
+                    if ($policies['parent'] == 'Y') {
+                        $output .= __('Parents') . "<br />";
+                    }
+                    if ($policies['staff'] == 'Y') {
+                        $output .= __('Staff') . "<br />";
+                    }
+                    if ($policies['student'] == 'Y') {
+                        $output .= __('Students') . "<br />";
+                    }
+                }
+                return $output;
+            })
+            ->width('17%');
+
+        $table->addColumn('gibbonPersonIDCreator', __('Created By'))
+            ->format(Format::using('name', ['title', 'preferredName', 'surname', 'Staff']))
+            ->width('20%');
+
+        echo $table->render($policies);
     }
 }
-?>

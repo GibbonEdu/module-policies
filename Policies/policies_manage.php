@@ -42,127 +42,123 @@ if (isActionAccessible($guid, $connection2, '/modules/Policies/policies_manage.p
 
     $search = $_GET['search'] ?? '';
 
-    echo "<h2 class='top'>";
-    echo __('Search');
-    echo '</h2>';
-
     $form = Form::create('search', $_SESSION[$guid]['absoluteURL'].'/index.php', 'get');
+    $form->setTitle(__('Search'));
     $form->setClass('noIntBorder fullWidth');
 
     $form->addHiddenValue('q', '/modules/'.$_SESSION[$guid]['module'].'/policies_manage.php');
 
     $row = $form->addRow();
-    $row->addLabel('search', __('Search For'))->description(__('Name, Short Name, Category, Department.'));
-    $row->addTextField('search')->setValue($search);
+        $row->addLabel('search', __('Search For'))->description(__('Name, Short Name, Category, Department.'));
+        $row->addTextField('search')->setValue($search);
 
     $row = $form->addRow();
-    $row->addSearchSubmit($gibbon->session, __('Clear Search'));
+        $row->addSearchSubmit($gibbon->session, __('Clear Search'));
 
     echo $form->getOutput();
 
-    try {
+    $roleGateway = $container->get(RoleGateway::class);
 
-        $roleGateway = $container->get(RoleGateway::class);
-        $criteriaRole = $roleGateway->newQueryCriteria();
+    $policiesGateway = $container->get(PoliciesGateway::class);
+    $criteria = $policiesGateway
+        ->newQueryCriteria()
+        ->searchBy($policiesGateway->getSearchableColumns(), $search)
+        ->sortBy(['scope', 'gibbonDepartment.name', 'category', 'policiesPolicy.name'])
+        ->fromPOST();
 
-        $policiesGateway = $container->get(PoliciesGateway::class);
-        $criteriaPolicies = $policiesGateway->newQueryCriteria();
+    $policies = $policiesGateway->queryPolicies($criteria, $search);
 
-        $policies = $policiesGateway->queryPolicies($criteriaPolicies, $search);
+    $table = DataTable::createPaginated('policies', $criteria);
+    $table->setTitle(__('View'));
 
-        $table = DataTable::createPaginated('policies', $criteriaPolicies);
-        $table->setTitle(__('View'));
+    $table->addMetaData('blankSlate', __('There are no policies to view.'));
 
-        $table->addHeaderAction('add', __('Add'))
-                ->setURL('/modules/Policies/policies_manage_add.php')
-                ->addParam('search', $search);
-
-        $table->modifyRows(function ($policies, $row) {
-            if ($policies['active'] == 'N') {
-                $row->addClass('error');
+    $table->addExpandableColumn('description')
+        ->format(function ($policies) {
+            $output = '';
+            if (!empty($policies['description'])) {
+                $output .= '<strong>'.__('Description').'</strong>:';
+                $output .= '<br />'.$policies['description'];
             }
-            return $row;
-        });
+            return $output;
+        })
+        ->width('5%');
 
-        $table->addColumn('scope', __('Scope'))
-                ->format(function($policies) {
-                    $output = '';
-                    $output .= '<strong>'.__($policies['scope']).'</strong>';
-                    $output .= '<br/>'.Format::small($policies['department']);
-                    return $output;
-                })
-                ->description(__('Department'))
-                ->width('20%');
+    $table->addHeaderAction('add', __('Add'))
+        ->setURL('/modules/Policies/policies_manage_add.php')
+        ->addParam('search', $search)
+        ->displayLabel();
 
-        $table->addColumn('name', __('Name'))
-                ->format(function($policies) {
-                    $output = '';
-                    $output .= '<strong>'.Format::link($policies['location'], $policies['name']).'</strong>';
-                    $output .= '<br/>'.Format::small($policies['nameShort']);
-                    return $output;
-                })
-                ->description(__('Name Short'))
-                ->width('30%');
+    $table->modifyRows(function ($policies, $row) {
+        if ($policies['active'] == 'N') {
+            $row->addClass('error');
+        }
+        return $row;
+    });
 
+    $table->addColumn('scope', __('Scope'))
+        ->format(function ($policies) {
+            $output = '';
+            $output .= '<strong>'.__($policies['scope']).'</strong>';
+            $output .= '<br/>'.Format::small($policies['department']);
+            return $output;
+        })
+        ->description(__('Department'))
+        ->width('20%');
 
-        $table->addColumn('category', __('Category'))->width('22%');
+    $table->addColumn('name', __('Name'))
+        ->format(function ($policies) {
+            $output = '';
+            $output .= '<strong>'.Format::link($policies['location'], $policies['name']).'</strong>';
+            $output .= '<br/>'.Format::small($policies['nameShort']);
+            return $output;
+        })
+        ->description(__('Name Short'))
+        ->width('30%');
 
-        $table->addColumn('audience', __('Audience'))
-                ->format(function($policies) use ($roleGateway) {
-                    $output = '';
-                    if ($policies['gibbonRoleIDList'] == '' && $policies['parent'] == 'N' && $policies['staff'] == 'N' && $policies['student'] == 'N') {
-                        $output .= '<i>'.__('No audience sets').'</i>';
-                    } else {
-                        if ($policies['gibbonRoleIDList'] != '') {
-                            $roles = explode(',', $policies['gibbonRoleIDList']);
-                            foreach ($roles as $role) {
-                                $roleName = $roleGateway->getRoleByID($role);
-                                if ($roleName) {
-                                    $output .= __($roleName['name'])."<br />";
-                                }
-                            }
-                        }
-                        if ($policies['parent'] == 'Y') {
-                            $output .= _('Parents')."<br />";
-                        }
-                        if ($policies['staff'] == 'Y') {
-                            $output .= _('Staff')."<br />";
-                        }
-                        if ($policies['student'] == 'Y') {
-                            $output .= _('Students')."<br />";
+    $table->addColumn('category', __('Category'))->width('22%');
+
+    $table->addColumn('gibbonRoleIDList', __('Audience'))
+        ->format(function ($policies) use ($roleGateway) {
+            $output = '';
+            if ($policies['gibbonRoleIDList'] == '' && $policies['parent'] == 'N' && $policies['staff'] == 'N' && $policies['student'] == 'N') {
+                $output .= '<i>'.__('No audience sets').'</i>';
+            } else {
+                if ($policies['gibbonRoleIDList'] != '') {
+                    $roles = explode(',', $policies['gibbonRoleIDList']);
+                    foreach ($roles as $role) {
+                        $roleName = $roleGateway->getRoleByID($role);
+                        if ($roleName) {
+                            $output .= __($roleName['name'])."<br />";
                         }
                     }
-                    return $output;
-                })
-                ->width('20%');
+                }
+                if ($policies['parent'] == 'Y') {
+                    $output .= __('Parents')."<br />";
+                }
+                if ($policies['staff'] == 'Y') {
+                    $output .= __('Staff')."<br />";
+                }
+                if ($policies['student'] == 'Y') {
+                    $output .= __('Students')."<br />";
+                }
+            }
+            return $output;
+        })
+        ->width('20%');
 
 
-        $table->addActionColumn()
-                ->addParam('policiesPolicyID')
-                ->addParam('search')
-                ->format(function ($policies, $actions) use ($guid) {
-                    $actions->addAction('edit', __('Edit'))
-                    ->setURL('/modules/Policies/policies_manage_edit.php');
+    $table->addActionColumn()
+        ->addParam('policiesPolicyID')
+        ->addParam('search')
+        ->format(function ($policies, $actions) use ($guid) {
+            $actions->addAction('edit', __('Edit'))
+            ->setURL('/modules/Policies/policies_manage_edit.php');
 
-                    $actions->addAction('delete', __('Delete'))
-                    ->setURL('/modules/Policies/policies_manage_delete.php');
-                })
-                ->width('20%');
+            $actions->addAction('delete', __('Delete'))
+            ->setURL('/modules/Policies/policies_manage_delete.php');
+        })
+        ->width('20%');
 
-        $table->addExpandableColumn('description')
-                ->format(function($policies) {
-                    $output = '';
-                    if (!empty($policies['description'])) {
-                        $output .= '<strong>'.__('Description').'</strong>:';
-                        $output .= '<br />'.$policies['description'];
-                    }
-                    return $output;
-                })
-                ->width('10%');
-
-        echo $table->render($policies);
-    } catch (Exception $e) {
-        echo "<div class='error'>".$e->getMessage().'</div>';
-    }
+    echo $table->render($policies);
 }
-?>

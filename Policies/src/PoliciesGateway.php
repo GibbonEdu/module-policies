@@ -31,82 +31,74 @@ class PoliciesGateway extends QueryableGateway {
     use TableAware;
 
     private static $tableName = 'policiesPolicy';
-    private static $searchableColumns = ['name'];
+    private static $searchableColumns = ['policiesPolicy.name', 'policiesPolicy.nameShort', 'policiesPolicy.category', 'gibbonDepartment.name'];
 
-    public function queryPolicies(QueryCriteria $criteria, $search = null) {
+    public function queryPolicies(QueryCriteria $criteria) {
         $query = $this
-                ->newQuery()
-                ->from($this->getTableName())
-                ->cols([
-                    'policiesPolicy.policiesPolicyID',
-                    'policiesPolicy.name',
-                    'policiesPolicy.nameShort',
-                    'policiesPolicy.category',
-                    'policiesPolicy.description',
-                    'policiesPolicy.active',
-                    'policiesPolicy.scope',
-                    'policiesPolicy.gibbonDepartmentID',
-                    'policiesPolicy.type',
-                    'policiesPolicy.gibbonRoleIDList',
-                    'policiesPolicy.staff',
-                    'policiesPolicy.student',
-                    'policiesPolicy.parent',
-                    'policiesPolicy.location',
-                    'policiesPolicy.gibbonPersonIDCreator',
-                    'policiesPolicy.timestampCreated',
-                    'gibbonDepartment.name AS department',
-                    'gibbonPerson.surname',
-                    'gibbonPerson.preferredName',
-                    'gibbonPerson.title'
-                ])
-                ->innerJoin('gibbonPerson', 'policiesPolicy.gibbonPersonIDCreator=gibbonPerson.gibbonPersonID')
-                ->leftJoin('gibbonDepartment', 'policiesPolicy.gibbonDepartmentID=gibbonDepartment.gibbonDepartmentID')
-                ->orderBy(['scope', 'gibbonDepartment.name', 'category', 'policiesPolicy.name']);
-
-        if (trim($search) != '') {
-            $query->where('policiesPolicy.name LIKE :search OR policiesPolicy.nameShort LIKE :search OR policiesPolicy.category LIKE :search  OR gibbonDepartment.name LIKE :search')
-                    ->bindValue('search', '%'.$search.'%');
-        }
+            ->newQuery()
+            ->from($this->getTableName())
+            ->cols([
+                'policiesPolicy.policiesPolicyID',
+                'policiesPolicy.name',
+                'policiesPolicy.nameShort',
+                'policiesPolicy.category',
+                'policiesPolicy.description',
+                'policiesPolicy.active',
+                'policiesPolicy.scope',
+                'policiesPolicy.gibbonDepartmentID',
+                'policiesPolicy.type',
+                'policiesPolicy.gibbonRoleIDList',
+                'policiesPolicy.staff',
+                'policiesPolicy.student',
+                'policiesPolicy.parent',
+                'policiesPolicy.location',
+                'policiesPolicy.gibbonPersonIDCreator',
+                'policiesPolicy.timestampCreated',
+                'gibbonDepartment.name AS department',
+                'gibbonPerson.surname',
+                'gibbonPerson.preferredName',
+                'gibbonPerson.title'
+            ])
+            ->innerJoin('gibbonPerson', 'policiesPolicy.gibbonPersonIDCreator=gibbonPerson.gibbonPersonID')
+            ->leftJoin('gibbonDepartment', 'policiesPolicy.gibbonDepartmentID=gibbonDepartment.gibbonDepartmentID');
 
         return $this->runQuery($query, $criteria);
     }
 
     public function queryViewPoliciesByRole(QueryCriteria $criteria, $gibbonRoleIDCurrent = null) {
         $query = $this
-                ->newQuery()
-                ->from($this->getTableName())
-                ->cols([
-                    'policiesPolicy.policiesPolicyID',
-                    'policiesPolicy.name',
-                    'policiesPolicy.nameShort',
-                    'policiesPolicy.category',
-                    'policiesPolicy.description',
-                    'policiesPolicy.active',
-                    'policiesPolicy.scope',
-                    'policiesPolicy.gibbonDepartmentID',
-                    'policiesPolicy.type',
-                    'policiesPolicy.gibbonRoleIDList',
-                    'policiesPolicy.staff',
-                    'policiesPolicy.student',
-                    'policiesPolicy.parent',
-                    'policiesPolicy.location',
-                    'policiesPolicy.gibbonPersonIDCreator',
-                    'policiesPolicy.timestampCreated',
-                    'gibbonDepartment.name AS department',
-                    'gibbonPerson.surname',
-                    'gibbonPerson.preferredName',
-                    'gibbonPerson.title'
-                ])
-                ->innerJoin('gibbonPerson', 'policiesPolicy.gibbonPersonIDCreator=gibbonPerson.gibbonPersonID')
-                ->leftJoin('gibbonDepartment', 'policiesPolicy.gibbonDepartmentID=gibbonDepartment.gibbonDepartmentID')
-                ->where("policiesPolicy.active = 'Y'")
-                ->orderBy(['scope', 'gibbonDepartment.name', 'category', 'policiesPolicy.name']);
-
+            ->newQuery()
+            ->from($this->getTableName())
+            ->cols([
+                'policiesPolicy.policiesPolicyID',
+                'policiesPolicy.name',
+                'policiesPolicy.nameShort',
+                'policiesPolicy.category',
+                'policiesPolicy.description',
+                'policiesPolicy.active',
+                'policiesPolicy.scope',
+                'policiesPolicy.gibbonDepartmentID',
+                'policiesPolicy.type',
+                'policiesPolicy.gibbonRoleIDList',
+                'policiesPolicy.staff',
+                'policiesPolicy.student',
+                'policiesPolicy.parent',
+                'policiesPolicy.location',
+                'policiesPolicy.gibbonPersonIDCreator',
+                'policiesPolicy.timestampCreated',
+                'gibbonDepartment.name AS department',
+                'gibbonPerson.surname',
+                'gibbonPerson.preferredName',
+                'gibbonPerson.title'
+            ])
+            ->innerJoin('gibbonPerson', 'policiesPolicy.gibbonPersonIDCreator=gibbonPerson.gibbonPersonID')
+            ->leftJoin('gibbonDepartment', 'policiesPolicy.gibbonDepartmentID=gibbonDepartment.gibbonDepartmentID')
+            ->where("policiesPolicy.active = 'Y'");
 
         if ($gibbonRoleIDCurrent) {
             $query->where('FIND_IN_SET(:gibbonRoleIDCurrent , gibbonRoleIDList)')
-                    ->bindValue('gibbonRoleIDCurrent', $gibbonRoleIDCurrent);
-        }       
+                ->bindValue('gibbonRoleIDCurrent', $gibbonRoleIDCurrent);
+        }
 
         return $this->runQuery($query, $criteria);
     }

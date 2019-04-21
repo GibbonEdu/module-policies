@@ -48,7 +48,7 @@ if (isActionAccessible($guid, $connection2, '/modules/Policies/policies_manage_a
 
     if ($search != '') {
         echo "<div class='linkTop'>";
-        echo "<a href='".$_SESSION[$guid]['absoluteURL']."'/index.php?q=/modules/Policies/policies_manage.php&search='".$search."'>".('Back to Search Results')."</a>";
+        echo "<a href='".$_SESSION[$guid]['absoluteURL']."/index.php?q=/modules/Policies/policies_manage.php&search='".$search."'>".('Back to Search Results')."</a>";
         echo "</div>";
     }
 
