@@ -17,11 +17,15 @@ You should have received a copy of the GNU General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
+use Gibbon\Module\Policies\PoliciesGateway;
+
 include '../../gibbon.php';
 
 include './moduleFunctions.php';
 
-$URL = $_SESSION[$guid]['absoluteURL'].'/index.php?q=/modules/'.getModuleName($_POST['address']).'/policies_manage_add.php&search='.$_GET['search'];
+$search = $_GET['search'] ?? '';
+
+$URL = $_SESSION[$guid]['absoluteURL'].'/index.php?q=/modules/'.getModuleName($_POST['address']).'/policies_manage_add.php&search='.$search;
 
 if (isActionAccessible($guid, $connection2, '/modules/Policies/policies_manage_add.php') == false) {
     //Fail 0
@@ -103,12 +107,11 @@ if (isActionAccessible($guid, $connection2, '/modules/Policies/policies_manage_a
             exit();
         } else {
             //Write to database
+            $policies = $container->get(PoliciesGateway::class);
             try {
                 $data = array('scope' => $scope, 'gibbonDepartmentID' => $gibbonDepartmentID, 'name' => $name, 'nameShort' => $nameShort, 'active' => $active, 'category' => $category, 'description' => $description, 'type' => $type, 'location' => $location, 'gibbonRoleIDList' => $gibbonRoleIDList, 'parent' => $parent, 'staff' => $staff, 'student' => $student, 'gibbonPersonIDCreator' => $_SESSION[$guid]['gibbonPersonID'], 'timestampCreated' => date('Y-m-d H:i:s'));
-                $sql = 'INSERT INTO policiesPolicy SET scope=:scope, gibbonDepartmentID=:gibbonDepartmentID, name=:name, nameShort=:nameShort, active=:active, category=:category, description=:description, type=:type, location=:location, gibbonRoleIDList=:gibbonRoleIDList, parent=:parent, staff=:staff, student=:student, gibbonPersonIDCreator=:gibbonPersonIDCreator, timestampCreated=:timestampCreated';
-                $result = $connection2->prepare($sql);
-                $result->execute($data);
-            } catch (PDOException $e) {
+                $policies->insertPolicy($data);
+            } catch (Exception $e) {
                 //Fail 2
                 $URL = $URL.'&return=error2';
                 header("Location: {$URL}");
@@ -118,7 +121,7 @@ if (isActionAccessible($guid, $connection2, '/modules/Policies/policies_manage_a
             $AI = str_pad($connection2->lastInsertID(), 8, '0', STR_PAD_LEFT);
 
             //Success 0
-            $URL = $URL.'&return=success0&editID='.$AI;
+            $URL = $URL.'&return=success0&policiesPolicyID='.$AI;
             header("Location: {$URL}");
         }
     }

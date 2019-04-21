@@ -18,6 +18,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
 use Gibbon\Forms\Form;
+use Gibbon\Module\Policies\PoliciesGateway;
 
 //Module includes
 include './modules/Policies/moduleFunctions.php';
@@ -29,44 +30,40 @@ if (isActionAccessible($guid, $connection2, '/modules/Policies/policies_manage_e
     echo '</div>';
 } else {
     //Proceed!
-    echo "<div class='trail'>";
-    echo "<div class='trailHead'><a href='".$_SESSION[$guid]['absoluteURL']."'>Home</a> > <a href='".$_SESSION[$guid]['absoluteURL'].'/index.php?q=/modules/'.getModuleName($_GET['q']).'/'.getModuleEntry($_GET['q'], $connection2, $guid)."'>".getModuleName($_GET['q'])."</a> > <a href='".$_SESSION[$guid]['absoluteURL'].'/index.php?q=/modules/'.getModuleName($_GET['q'])."/policies_manage.php'>Manage Policies</a> > </div><div class='trailEnd'>Edit Policy</div>";
-    echo '</div>';
+    $page->breadcrumbs
+        ->add(__('Manage Policies'), 'policies_manage.php')
+        ->add(__('Edit Policy')); 
 
     if (isset($_GET['return'])) {
-        returnProcess($guid, $_GET['return'], null, null);
+        returnProcess($guid, $_GET['return']);
     }
 
-    //Check if school year specified
-    $policiesPolicyID = $_GET['policiesPolicyID'];
-    if ($policiesPolicyID == '') { echo "<div class='error'>";
-        echo 'You have not specified a policy.';
+    //Check if policy and search specified
+    $policiesPolicyID = $_GET['policiesPolicyID'] ?? '';
+    $search = $_GET['search'] ?? '';
+    
+    if ($policiesPolicyID == '') { 
+        echo "<div class='error'>";
+        echo __('You have not specified a policy.');
         echo '</div>';
     } else {
-        try {
-            $data = array('policiesPolicyID' => $policiesPolicyID);
-            $sql = 'SELECT * FROM policiesPolicy WHERE policiesPolicyID=:policiesPolicyID';
-            $result = $connection2->prepare($sql);
-            $result->execute($data);
-        } catch (PDOException $e) {
-            echo "<div class='error'>".$e->getMessage().'</div>';
-        }
+        $policies = $container->get(PoliciesGateway::class);
+        $data = array('policiesPolicyID' => $policiesPolicyID);
+        $policy = $policies->selectPolicyById($data);
 
-        if ($result->rowCount() != 1) {
+        if (!$policy) {
             echo "<div class='error'>";
-            echo 'The selected policy does not exist.';
+            echo __('The selected policy does not exist.');
             echo '</div>';
         } else {
             //Let's go!
-            $values = $result->fetch();
-
-            if ($_GET['search'] != '') {
+             if ($search != '') {
                 echo "<div class='linkTop'>";
-                echo "<a href='".$_SESSION[$guid]['absoluteURL'].'/index.php?q=/modules/Policies/policies_manage.php&search='.$_GET['search']."'>Back to Search Results</a>";
+                echo "<a href='".$_SESSION[$guid]['absoluteURL'].'/index.php?q=/modules/Policies/policies_manage.php&search='.$search."'>".__('Back to Search Results')."</a>";
                 echo '</div>';
             }
 
-            $form = Form::create('action', $_SESSION[$guid]['absoluteURL'].'/modules/Policies/policies_manage_editProcess.php?policiesPolicyID='.$policiesPolicyID.'&search='.$_GET['search']);
+            $form = Form::create('action', $_SESSION[$guid]['absoluteURL'].'/modules/Policies/policies_manage_editProcess.php?policiesPolicyID='.$policiesPolicyID.'&search='.$search);
         
             $form->addHiddenValue('address', $_SESSION[$guid]['address']);
 
@@ -74,7 +71,7 @@ if (isActionAccessible($guid, $connection2, '/modules/Policies/policies_manage_e
                 $row->addLabel('scope', 'Scope');
                 $row->addTextField('scope')->readonly();
 
-            if ($values['scope'] == 'Department') {
+            if ($policy['scope'] == 'Department') {
                 $sql = "SELECT gibbonDepartmentID as value, name FROM gibbonDepartment ORDER BY name";
                 $row = $form->addRow();
                     $row->addLabel('gibbonDepartmentID', __('Department'));
@@ -109,27 +106,27 @@ if (isActionAccessible($guid, $connection2, '/modules/Policies/policies_manage_e
                 $row->addLabel('type', __('Type'));
                 $row->addTextField('type')->readonly();
 
-            if ($values['type'] == 'File') {
+            if ($policy['type'] == 'File') {
                 $row = $form->addRow();
                     $row->addLabel('file', __('Policy File'));
-                    $row->addFileUpload('file')->isRequired()->setAttachment('attachment', $_SESSION[$guid]['absoluteURL'], $values['location']);
-            } else if ($values['type'] == 'Link') {
+                    $row->addFileUpload('file')->isRequired()->setAttachment('attachment', $_SESSION[$guid]['absoluteURL'], $policy['location']);
+            } else if ($policy['type'] == 'Link') {
                 $row = $form->addRow();
                     $row->addLabel('link', __('Policy Link'));
-                    $row->addURL('link')->maxLength(255)->isRequired()->setValue($values['location']);
+                    $row->addURL('link')->maxLength(255)->isRequired()->setValue($policy['location']);
             }
 
-            $values['roleCategories'] = array();
-            if ($values['staff'] == 'Y') $values['roleCategories'][] = "staff";
-            if ($values['student'] == 'Y') $values['roleCategories'][] = "student";
-            if ($values['parent'] == 'Y') $values['roleCategories'][] = "parent";
+            $policy['roleCategories'] = array();
+            if ($policy['staff'] == 'Y') $policy['roleCategories'][] = "staff";
+            if ($policy['student'] == 'Y') $policy['roleCategories'][] = "student";
+            if ($policy['parent'] == 'Y') $policy['roleCategories'][] = "parent";
 
             $sql = "SELECT DISTINCT LOWER(category) as value, category as name FROM gibbonRole";
             $row = $form->addRow();
                 $row->addLabel('roleCategories', __('Audience By Role Category'))->description(__('User role categories who should have view access.'));
                 $row->addCheckbox('roleCategories')->fromQuery($pdo, $sql);
 
-            $values['gibbonRoleIDList'] = explode(',', $values['gibbonRoleIDList']);
+            $policy['gibbonRoleIDList'] = explode(',', $policy['gibbonRoleIDList']);
             $sql = "SELECT gibbonRoleID as value, name FROM gibbonRole ORDER BY name";
             $row = $form->addRow();
                 $row->addLabel('gibbonRoleIDList', __('Audience By Role'))->description(__('User role groups who should have view access.'));
@@ -139,7 +136,7 @@ if (isActionAccessible($guid, $connection2, '/modules/Policies/policies_manage_e
                 $row->addFooter();
                 $row->addSubmit();
 
-            $form->loadAllValuesFrom($values);
+            $form->loadAllValuesFrom($policy);
 
             echo $form->getOutput();
         }

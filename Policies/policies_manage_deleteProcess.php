@@ -16,12 +16,13 @@ GNU General Public License for more details.
 You should have received a copy of the GNU General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
+use Gibbon\Module\Policies\PoliciesGateway;
 
 include '../../gibbon.php';
 
 include './moduleFunctions.php';
 
-$policiesPolicyID = $_GET['policiesPolicyID'];
+$policiesPolicyID = $_GET['policiesPolicyID'] ?? '';
 $URL = $_SESSION[$guid]['absoluteURL'].'/index.php?q=/modules/'.getModuleName($_POST['address'])."/policies_manage_delete.php&policiesPolicyID=$policiesPolicyID&search=".$_GET['search'];
 $URLDelete = $_SESSION[$guid]['absoluteURL'].'/index.php?q=/modules/'.getModuleName($_POST['address']).'/policies_manage.php&search='.$_GET['search'];
 
@@ -36,36 +37,17 @@ if (isActionAccessible($guid, $connection2, '/modules/Policies/policies_manage_d
         $URL = $URL.'&return=error1';
         header("Location: {$URL}");
     } else {
-        try {
-            $data = array('policiesPolicyID' => $policiesPolicyID);
-            $sql = 'SELECT * FROM policiesPolicy WHERE policiesPolicyID=:policiesPolicyID';
-            $result = $connection2->prepare($sql);
-            $result->execute($data);
-        } catch (PDOException $e) {
-            //Fail2
-            $URL = $URL.'&return=error2';
-            header("Location: {$URL}");
-            exit();
-        }
+        $policies = $container->get(PoliciesGateway::class);
+        $data = array('policiesPolicyID' => $policiesPolicyID);
 
-        if ($result->rowCount() != 1) {
+        if (!$policies->selectPolicyById($data)) {
             //Fail 2
             $URL = $URL.'&return=error2';
             header("Location: {$URL}");
         } else {
             //Write to database
-            try {
-                $data = array('policiesPolicyID' => $policiesPolicyID);
-                $sql = 'DELETE FROM policiesPolicy WHERE policiesPolicyID=:policiesPolicyID';
-                $result = $connection2->prepare($sql);
-                $result->execute($data);
-            } catch (PDOException $e) {
-                //Fail 2
-                $URL = $URL.'&return=error2';
-                header("Location: {$URL}");
-                exit();
-            }
-
+            $data = array('policiesPolicyID' => $policiesPolicyID);
+            $policies->deletePolicy($data);
             //Success 0
             $URLDelete = $URLDelete.'&return=success0';
             header("Location: {$URLDelete}");

@@ -101,3 +101,8 @@ $sql[$count][1] = "";
 ++$count;
 $sql[$count][0] = '1.3.00';
 $sql[$count][1] = "";
+
+//v2.0.00
+++$count;
+$sql[$count][0] = '2.0.00';
+$sql[$count][1] = "";

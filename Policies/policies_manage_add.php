@@ -28,26 +28,31 @@ if (isActionAccessible($guid, $connection2, '/modules/Policies/policies_manage_a
     echo 'You do not have access to this action.';
     echo '</div>';
 } else {
-    echo "<div class='trail'>";
-    echo "<div class='trailHead'><a href='".$_SESSION[$guid]['absoluteURL']."'>Home</a> > <a href='".$_SESSION[$guid]['absoluteURL'].'/index.php?q=/modules/'.getModuleName($_GET['q']).'/'.getModuleEntry($_GET['q'], $connection2, $guid)."'>".getModuleName($_GET['q'])."</a> > <a href='".$_SESSION[$guid]['absoluteURL'].'/index.php?q=/modules/'.getModuleName($_GET['q'])."/policies_manage.php'>Manage Policies</a> > </div><div class='trailEnd'>Add Policy</div>";
-    echo '</div>';
+    //Proceed!
+    $page->breadcrumbs
+        ->add(__('Manage Policies'), 'policies_manage.php')
+        ->add(__('Add Policy')); 
 
+    $search = $_GET['search'] ?? '';
+    $policiesPolicyID = $_GET['policiesPolicyID'] ?? '';
+    
     $returns = array();
     $editLink = '';
-    if (isset($_GET['editID'])) {
-        $editLink = $_SESSION[$guid]['absoluteURL'].'/index.php?q=/modules/Policies/policies_manage_edit.php&policiesPolicyID='.$_GET['editID'].'&search='.$_GET['search'];
+    if ($policiesPolicyID) {
+        $editLink = $_SESSION[$guid]['absoluteURL'].'/index.php?q=/modules/Policies/policies_manage_edit.php&policiesPolicyID='.$policiesPolicyID.'&search='.$search ;
     }
     if (isset($_GET['return'])) {
         returnProcess($guid, $_GET['return'], $editLink, $returns);
     }
 
 
-    if ($_GET['search'] != '') { echo "<div class='linkTop'>";
-        echo "<a href='".$_SESSION[$guid]['absoluteURL'].'/index.php?q=/modules/Policies/policies_manage.php&search='.$_GET['search']."'>Back to Search Results</a>";
-        echo '</div>';
+    if ($search != '') {
+        echo "<div class='linkTop'>";
+        echo "<a href='".$_SESSION[$guid]['absoluteURL']."'/index.php?q=/modules/Policies/policies_manage.php&search='".$search."'>".('Back to Search Results')."</a>";
+        echo "</div>";
     }
 
-    $form = Form::create('action', $_SESSION[$guid]['absoluteURL'].'/modules/Policies/policies_manage_addProcess.php?search='.$_GET['search']);
+    $form = Form::create('action', $_SESSION[$guid]['absoluteURL'].'/modules/Policies/policies_manage_addProcess.php?search='.$search );
         
     $form->addHiddenValue('address', $_SESSION[$guid]['address']);
 
