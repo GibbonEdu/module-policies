@@ -1,6 +1,11 @@
 CHANGELOG
 =========
+v2.0.01
+-------
+Post-merge fix to the View Policies table
+
 v2.0.00
+-------
 Object oriented rewrite, code cleanup and refatored breadcrumbs to v17.0.00 or greather
 
 v1.3.00
