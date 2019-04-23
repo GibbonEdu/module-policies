@@ -96,7 +96,13 @@ class PoliciesGateway extends QueryableGateway {
             ->where("policiesPolicy.active = 'Y'");
 
         if ($gibbonRoleIDCurrent) {
-            $query->where('FIND_IN_SET(:gibbonRoleIDCurrent , gibbonRoleIDList)')
+            $query->innerJoin('gibbonRole', 'gibbonRole.gibbonRoleID = :gibbonRoleIDCurrent')
+                ->where(function ($query) {
+                    $query->where("FIND_IN_SET(gibbonRole.gibbonRoleID, policiesPolicy.gibbonRoleIDList)")
+                        ->orWhere("gibbonRole.category='Staff' AND policiesPolicy.staff = 'Y'")
+                        ->orWhere("gibbonRole.category='Student' AND policiesPolicy.student = 'Y'")
+                        ->orWhere("gibbonRole.category='Parent' AND policiesPolicy.parent = 'Y'");
+                })
                 ->bindValue('gibbonRoleIDCurrent', $gibbonRoleIDCurrent);
         }
 
