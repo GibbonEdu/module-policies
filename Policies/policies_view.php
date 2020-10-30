@@ -75,7 +75,7 @@ if (isActionAccessible($guid, $connection2, '/modules/Policies/policies_view.php
             ->newQueryCriteria()
             ->sortBy(['scope', 'gibbonDepartment.name', 'category', 'policiesPolicy.name'])
             ->fromPOST();
-        
+
         if ($allPolicies == 'on') {
             $policies = $policiesGateway->queryViewPoliciesByRole($criteria);
         } else {
@@ -95,19 +95,8 @@ if (isActionAccessible($guid, $connection2, '/modules/Policies/policies_view.php
                     $output .= '<br />'.$policies['description'];
                 }
                 return $output;
-            })
-            ->width('5%');
+            });
 
-        $table->addColumn('scope', __('Scope'))
-            ->format(function ($policies) {
-                $output = '';
-                $output .= '<strong>'.__($policies['scope']).'</strong>';
-                $output .= '<br/>'.Format::small($policies['department']);
-                return $output;
-            })
-            ->description(__('Department'))
-            ->width('15%');
-        
         $table->addColumn('name', __('Name'))
             ->format(function ($policies) {
                 $output = '';
@@ -115,11 +104,19 @@ if (isActionAccessible($guid, $connection2, '/modules/Policies/policies_view.php
                 $output .= '<br/>' . Format::small($policies['nameShort']);
                 return $output;
             })
-            ->description(__('Name Short'))
-            ->width('25%');
+            ->description(__('Name Short'));
+
+        $table->addColumn('scope', __('Scope'))
+        ->format(function ($policies) {
+            $output = '';
+            $output .= '<strong>'.__($policies['scope']).'</strong>';
+            $output .= '<br/>'.Format::small($policies['department']);
+            return $output;
+        })
+        ->description(__('Department'));
 
         $table->addColumn('category', __('Category'))->width('18%');
-        
+
         $table->addColumn('gibbonRoleIDList', __('Audience'))
             ->format(function ($policies) use ($roleGateway) {
                 $output = '';
@@ -146,12 +143,10 @@ if (isActionAccessible($guid, $connection2, '/modules/Policies/policies_view.php
                     }
                 }
                 return $output;
-            })
-            ->width('17%');
+            });
 
         $table->addColumn('gibbonPersonIDCreator', __('Created By'))
-            ->format(Format::using('name', ['title', 'preferredName', 'surname', 'Staff']))
-            ->width('20%');
+            ->format(Format::using('name', ['title', 'preferredName', 'surname', 'Staff']));
 
         echo $table->render($policies);
     }

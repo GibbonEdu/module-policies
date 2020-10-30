@@ -1,5 +1,9 @@
 CHANGELOG
 =========
+v2.0.02
+-------
+Improved mobile responsive View View Policies table
+
 v2.0.01
 -------
 Post-merge fix to the View Policies table
