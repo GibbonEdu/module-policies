@@ -31,15 +31,15 @@ if (isActionAccessible($guid, $connection2, '/modules/Policies/policies_manage_a
     //Proceed!
     $page->breadcrumbs
         ->add(__('Manage Policies'), 'policies_manage.php')
-        ->add(__('Add Policy')); 
+        ->add(__('Add Policy'));
 
     $search = $_GET['search'] ?? '';
     $policiesPolicyID = $_GET['policiesPolicyID'] ?? '';
-    
+
     $returns = array();
     $editLink = '';
     if ($policiesPolicyID) {
-        $editLink = $_SESSION[$guid]['absoluteURL'].'/index.php?q=/modules/Policies/policies_manage_edit.php&policiesPolicyID='.$policiesPolicyID.'&search='.$search ;
+        $editLink = $session->get('absoluteURL').'/index.php?q=/modules/Policies/policies_manage_edit.php&policiesPolicyID='.$policiesPolicyID.'&search='.$search ;
     }
     if (isset($_GET['return'])) {
         returnProcess($guid, $_GET['return'], $editLink, $returns);
@@ -48,13 +48,13 @@ if (isActionAccessible($guid, $connection2, '/modules/Policies/policies_manage_a
 
     if ($search != '') {
         echo "<div class='linkTop'>";
-        echo "<a href='".$_SESSION[$guid]['absoluteURL']."/index.php?q=/modules/Policies/policies_manage.php&search='".$search."'>".('Back to Search Results')."</a>";
+        echo "<a href='".$session->get('absoluteURL')."/index.php?q=/modules/Policies/policies_manage.php&search='".$search."'>".('Back to Search Results')."</a>";
         echo "</div>";
     }
 
-    $form = Form::create('action', $_SESSION[$guid]['absoluteURL'].'/modules/Policies/policies_manage_addProcess.php?search='.$search );
-        
-    $form->addHiddenValue('address', $_SESSION[$guid]['address']);
+    $form = Form::create('action', $session->get('absoluteURL').'/modules/Policies/policies_manage_addProcess.php?search='.$search );
+
+    $form->addHiddenValue('address', $session->get('address'));
 
     $scopes = array(
         'School' => __('School'),
