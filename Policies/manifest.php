@@ -25,7 +25,7 @@ $description = 'A place to store, share and view school policies, either as file
 $entryURL = 'policies_view.php';
 $type = 'Additional';
 $category = 'Other';
-$version = '2.0.03';
+$version = '2.1.00';
 $author = 'Ross Parker';
 $url = 'http://rossparker.org';
 
