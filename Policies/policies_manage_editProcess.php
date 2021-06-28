@@ -27,7 +27,7 @@ include './moduleFunctions.php';
 $policiesPolicyID = $_GET['policiesPolicyID'] ?? '';
 $search = $_GET['search'] ?? '';
 
-$URL = $_SESSION[$guid]['absoluteURL'] . '/index.php?q=/modules/' . getModuleName($_POST['address']) . "/policies_manage_edit.php&policiesPolicyID=$policiesPolicyID&search=".$search;
+$URL = $session->get('absoluteURL') . '/index.php?q=/modules/' . getModuleName($_POST['address']) . "/policies_manage_edit.php&policiesPolicyID=$policiesPolicyID&search=".$search;
 
 if (isActionAccessible($guid, $connection2, '/modules/Policies/policies_manage_edit.php') == false) {
     //Fail 0
@@ -46,12 +46,12 @@ if (isActionAccessible($guid, $connection2, '/modules/Policies/policies_manage_e
         echo '</div>';
     } else {
         //Validate Inputs
-        $name = $_POST['name'];
-        $nameShort = $_POST['nameShort'];
-        $active = $_POST['active'];
-        $category = $_POST['category'];
-        $description = $_POST['description'];
-        $location = $policy['location'];
+        $name = $_POST['name'] ?? '';
+        $nameShort = $_POST['nameShort'] ?? '';
+        $active = $_POST['active'] ?? '';
+        $category = $_POST['category'] ?? '';
+        $description = $_POST['description'] ?? '';
+        $location = $policy['location'] ?? '';
         if ($policy['type'] == 'Link' && !empty($_POST['link'])) {
             $location = isset($_POST['link']) ? $_POST['link'] : '';
         } else if ($policy['type'] == 'File') {
@@ -72,7 +72,7 @@ if (isActionAccessible($guid, $connection2, '/modules/Policies/policies_manage_e
         } else {
 
             if (!empty($_FILES['file']['tmp_name'])) {
-                $fileUploader = new Gibbon\FileUploader($pdo, $gibbon->session);
+                $fileUploader = new Gibbon\FileUploader($pdo, $session);
 
                 $file = (isset($_FILES['file'])) ? $_FILES['file'] : null;
 

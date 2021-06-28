@@ -36,7 +36,7 @@ if (isActionAccessible($guid, $connection2, '/modules/Policies/policies_manage_d
 
     //Check if school year specified
     $policiesPolicyID = $_GET['policiesPolicyID'] ?? '';
-    if ($policiesPolicyID == '') { 
+    if ($policiesPolicyID == '') {
         echo "<div class='error'>";
         echo __('You have not specified a policy.');
         echo '</div>';
@@ -50,7 +50,7 @@ if (isActionAccessible($guid, $connection2, '/modules/Policies/policies_manage_d
             echo '</div>';
         } else {
             //Let's go!
-            $form = DeleteForm::createForm($_SESSION[$guid]['absoluteURL']."/modules/Policies/policies_manage_deleteProcess.php?policiesPolicyID=".$policiesPolicyID."&search=".$_GET['search']);
+            $form = DeleteForm::createForm($session->get('absoluteURL')."/modules/Policies/policies_manage_deleteProcess.php?policiesPolicyID=".$policiesPolicyID."&search=".$_GET['search']);
             echo $form->getOutput();
         }
     }

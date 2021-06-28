@@ -32,7 +32,7 @@ if (isActionAccessible($guid, $connection2, '/modules/Policies/policies_manage_e
     //Proceed!
     $page->breadcrumbs
         ->add(__('Manage Policies'), 'policies_manage.php')
-        ->add(__('Edit Policy')); 
+        ->add(__('Edit Policy'));
 
     if (isset($_GET['return'])) {
         returnProcess($guid, $_GET['return']);
@@ -41,8 +41,8 @@ if (isActionAccessible($guid, $connection2, '/modules/Policies/policies_manage_e
     //Check if policy and search specified
     $policiesPolicyID = $_GET['policiesPolicyID'] ?? '';
     $search = $_GET['search'] ?? '';
-    
-    if ($policiesPolicyID == '') { 
+
+    if ($policiesPolicyID == '') {
         echo "<div class='error'>";
         echo __('You have not specified a policy.');
         echo '</div>';
@@ -59,13 +59,13 @@ if (isActionAccessible($guid, $connection2, '/modules/Policies/policies_manage_e
             //Let's go!
              if ($search != '') {
                 echo "<div class='linkTop'>";
-                echo "<a href='".$_SESSION[$guid]['absoluteURL'].'/index.php?q=/modules/Policies/policies_manage.php&search='.$search."'>".__('Back to Search Results')."</a>";
+                echo "<a href='".$session->get('absoluteURL').'/index.php?q=/modules/Policies/policies_manage.php&search='.$search."'>".__('Back to Search Results')."</a>";
                 echo '</div>';
             }
 
-            $form = Form::create('action', $_SESSION[$guid]['absoluteURL'].'/modules/Policies/policies_manage_editProcess.php?policiesPolicyID='.$policiesPolicyID.'&search='.$search);
-        
-            $form->addHiddenValue('address', $_SESSION[$guid]['address']);
+            $form = Form::create('action', $session->get('absoluteURL').'/modules/Policies/policies_manage_editProcess.php?policiesPolicyID='.$policiesPolicyID.'&search='.$search);
+
+            $form->addHiddenValue('address', $session->get('address'));
 
             $row = $form->addRow();
                 $row->addLabel('scope', 'Scope');
@@ -109,7 +109,7 @@ if (isActionAccessible($guid, $connection2, '/modules/Policies/policies_manage_e
             if ($policy['type'] == 'File') {
                 $row = $form->addRow();
                     $row->addLabel('file', __('Policy File'));
-                    $row->addFileUpload('file')->isRequired()->setAttachment('attachment', $_SESSION[$guid]['absoluteURL'], $policy['location']);
+                    $row->addFileUpload('file')->isRequired()->setAttachment('attachment', $session->get('absoluteURL'), $policy['location']);
             } else if ($policy['type'] == 'Link') {
                 $row = $form->addRow();
                     $row->addLabel('link', __('Policy Link'));

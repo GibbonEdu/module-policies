@@ -1,5 +1,10 @@
 CHANGELOG
 =========
+v2.1.00
+-------
+Refactored session variables and null coalesce
+Added core v22 requirement
+
 v2.0.02
 -------
 Improved mobile responsive View View Policies table

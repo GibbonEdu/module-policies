@@ -25,7 +25,7 @@ include './moduleFunctions.php';
 
 $search = $_GET['search'] ?? '';
 
-$URL = $_SESSION[$guid]['absoluteURL'].'/index.php?q=/modules/'.getModuleName($_POST['address']).'/policies_manage_add.php&search='.$search;
+$URL = $session->get('absoluteURL').'/index.php?q=/modules/'.getModuleName($_POST['address']).'/policies_manage_add.php&search='.$search;
 
 if (isActionAccessible($guid, $connection2, '/modules/Policies/policies_manage_add.php') == false) {
     //Fail 0
@@ -33,19 +33,16 @@ if (isActionAccessible($guid, $connection2, '/modules/Policies/policies_manage_a
     header("Location: {$URL}");
 } else {
     //Proceed!
-    $scope = $_POST['scope'];
-    $gibbonDepartmentID = null;
-    if (isset($_POST['gibbonDepartmentID'])) {
-        $gibbonDepartmentID = $_POST['gibbonDepartmentID'];
-    }
-    $name = $_POST['name'];
-    $nameShort = $_POST['nameShort'];
-    $active = $_POST['active'];
-    $category = $_POST['category'];
-    $description = $_POST['description'];
-    $type = $_POST['type'];
-    $link = isset($_POST['link'])? $_POST['link'] : '';
-    
+    $scope = $_POST['scope'] ?? '';
+    $gibbonDepartmentID = $_POST['gibbonDepartmentID'] ?? null;
+    $name = $_POST['name'] ?? '';
+    $nameShort = $_POST['nameShort'] ?? '';
+    $active = $_POST['active'] ?? '';
+    $category = $_POST['category'] ?? '';
+    $description = $_POST['description'] ?? '';
+    $type = $_POST['type'] ?? '';
+    $link = $_POST['link'] ?? '';
+
     $gibbonRoleIDList = isset($_POST['gibbonRoleIDList'])? $_POST['gibbonRoleIDList'] : array();
     $gibbonRoleIDList = implode(',', $gibbonRoleIDList);
 
@@ -79,7 +76,7 @@ if (isActionAccessible($guid, $connection2, '/modules/Policies/policies_manage_a
             } else {
                 //Move attached image  file, if there is one
                 if (!empty($_FILES['file']['tmp_name'])) {
-                    $fileUploader = new Gibbon\FileUploader($pdo, $gibbon->session);
+                    $fileUploader = new Gibbon\FileUploader($pdo, $session);
 
                     $file = (isset($_FILES['file']))? $_FILES['file'] : null;
 
@@ -109,7 +106,7 @@ if (isActionAccessible($guid, $connection2, '/modules/Policies/policies_manage_a
             //Write to database
             $policies = $container->get(PoliciesGateway::class);
             try {
-                $data = array('scope' => $scope, 'gibbonDepartmentID' => $gibbonDepartmentID, 'name' => $name, 'nameShort' => $nameShort, 'active' => $active, 'category' => $category, 'description' => $description, 'type' => $type, 'location' => $location, 'gibbonRoleIDList' => $gibbonRoleIDList, 'parent' => $parent, 'staff' => $staff, 'student' => $student, 'gibbonPersonIDCreator' => $_SESSION[$guid]['gibbonPersonID'], 'timestampCreated' => date('Y-m-d H:i:s'));
+                $data = array('scope' => $scope, 'gibbonDepartmentID' => $gibbonDepartmentID, 'name' => $name, 'nameShort' => $nameShort, 'active' => $active, 'category' => $category, 'description' => $description, 'type' => $type, 'location' => $location, 'gibbonRoleIDList' => $gibbonRoleIDList, 'parent' => $parent, 'staff' => $staff, 'student' => $student, 'gibbonPersonIDCreator' => $session->get('gibbonPersonID'), 'timestampCreated' => date('Y-m-d H:i:s'));
                 $policies->insertPolicy($data);
             } catch (Exception $e) {
                 //Fail 2

@@ -23,8 +23,8 @@ include '../../gibbon.php';
 include './moduleFunctions.php';
 
 $policiesPolicyID = $_GET['policiesPolicyID'] ?? '';
-$URL = $_SESSION[$guid]['absoluteURL'].'/index.php?q=/modules/'.getModuleName($_POST['address'])."/policies_manage_delete.php&policiesPolicyID=$policiesPolicyID&search=".$_GET['search'];
-$URLDelete = $_SESSION[$guid]['absoluteURL'].'/index.php?q=/modules/'.getModuleName($_POST['address']).'/policies_manage.php&search='.$_GET['search'];
+$URL = $session->get('absoluteURL').'/index.php?q=/modules/'.getModuleName($_POST['address'])."/policies_manage_delete.php&policiesPolicyID=$policiesPolicyID&search=".$_GET['search'];
+$URLDelete = $session->get('absoluteURL').'/index.php?q=/modules/'.getModuleName($_POST['address']).'/policies_manage.php&search='.$_GET['search'];
 
 if (isActionAccessible($guid, $connection2, '/modules/Policies/policies_manage_delete.php') == false) {
     //Fail 0

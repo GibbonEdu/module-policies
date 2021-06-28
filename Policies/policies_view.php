@@ -52,18 +52,18 @@ if (isActionAccessible($guid, $connection2, '/modules/Policies/policies_view.php
         if ($highestAction == 'View Policies_all') {
             $allPolicies = $_GET['allPolicies'] ?? '';
 
-            $form = Form::create('search', $_SESSION[$guid]['absoluteURL'] . '/index.php', 'get');
+            $form = Form::create('search', $session->get('absoluteURL') . '/index.php', 'get');
             $form->setTitle(__('Filters'));
             $form->setClass('noIntBorder fullWidth');
 
-            $form->addHiddenValue('q', '/modules/' . $_SESSION[$guid]['module'] . '/policies_view.php');
+            $form->addHiddenValue('q', '/modules/' . $session->get('module') . '/policies_view.php');
 
             $row = $form->addRow();
                 $row->addLabel('allPolicies', __('All Policies'))->description(__('Override audience to reveal all policies.'));
                 $row->addCheckbox('allPolicies')->checked($allPolicies);
 
             $row = $form->addRow();
-                $row->addSearchSubmit($gibbon->session, __('Clear Filters'));
+                $row->addSearchSubmit($session, __('Clear Filters'));
 
             echo $form->getOutput();
         }
@@ -79,7 +79,7 @@ if (isActionAccessible($guid, $connection2, '/modules/Policies/policies_view.php
         if ($allPolicies == 'on') {
             $policies = $policiesGateway->queryViewPoliciesByRole($criteria);
         } else {
-            $policies = $policiesGateway->queryViewPoliciesByRole($criteria, $_SESSION[$guid]['gibbonRoleIDCurrent']);
+            $policies = $policiesGateway->queryViewPoliciesByRole($criteria, $session->get('gibbonRoleIDCurrent'));
         }
 
         $table = DataTable::createPaginated('policies', $criteria);
