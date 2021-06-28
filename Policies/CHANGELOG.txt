@@ -1,8 +1,9 @@
 CHANGELOG
 =========
-c2.0.03
+v2.1.00
 -------
 Refactored session variables and null coalesce
+Added core v22 requirement
 
 v2.0.02
 -------
