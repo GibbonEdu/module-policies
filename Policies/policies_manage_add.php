@@ -36,14 +36,11 @@ if (isActionAccessible($guid, $connection2, '/modules/Policies/policies_manage_a
     $search = $_GET['search'] ?? '';
     $policiesPolicyID = $_GET['policiesPolicyID'] ?? '';
 
-    $returns = array();
     $editLink = '';
     if ($policiesPolicyID) {
         $editLink = $session->get('absoluteURL').'/index.php?q=/modules/Policies/policies_manage_edit.php&policiesPolicyID='.$policiesPolicyID.'&search='.$search ;
     }
-    if (isset($_GET['return'])) {
-        returnProcess($guid, $_GET['return'], $editLink, $returns);
-    }
+    $page->return->setEditLink($editLink);
 
 
     if ($search != '') {

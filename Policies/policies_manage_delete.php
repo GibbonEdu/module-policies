@@ -29,11 +29,6 @@ if (isActionAccessible($guid, $connection2, '/modules/Policies/policies_manage_d
     echo __('You do not have access to this action.');
     echo '</div>';
 } else {
-    //Proceed!
-    if (isset($_GET['return'])) {
-        returnProcess($guid, $_GET['return'], null, null);
-    }
-
     //Check if school year specified
     $policiesPolicyID = $_GET['policiesPolicyID'] ?? '';
     if ($policiesPolicyID == '') {

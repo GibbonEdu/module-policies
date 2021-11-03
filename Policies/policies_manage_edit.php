@@ -34,10 +34,6 @@ if (isActionAccessible($guid, $connection2, '/modules/Policies/policies_manage_e
         ->add(__('Manage Policies'), 'policies_manage.php')
         ->add(__('Edit Policy'));
 
-    if (isset($_GET['return'])) {
-        returnProcess($guid, $_GET['return']);
-    }
-
     //Check if policy and search specified
     $policiesPolicyID = $_GET['policiesPolicyID'] ?? '';
     $search = $_GET['search'] ?? '';

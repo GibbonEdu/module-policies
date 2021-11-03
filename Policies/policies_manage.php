@@ -36,10 +36,6 @@ if (isActionAccessible($guid, $connection2, '/modules/Policies/policies_manage.p
     // Proceed!
     $page->breadcrumbs->add(__('Manage Policies'));
 
-    if (isset($_GET['return'])) {
-        returnProcess($guid, $_GET['return'], null, null);
-    }
-
     $search = $_GET['search'] ?? '';
 
     $form = Form::create('search', $session->get('absoluteURL').'/index.php', 'get');
