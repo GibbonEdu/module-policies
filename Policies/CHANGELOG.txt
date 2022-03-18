@@ -1,5 +1,9 @@
 CHANGELOG
 =========
+v2.1.02
+-------
+Refactoring of linkTop divs
+
 v2.1.01
 -------
 Removed deprecated function calls

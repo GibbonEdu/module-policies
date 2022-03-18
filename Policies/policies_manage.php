@@ -146,7 +146,7 @@ if (isActionAccessible($guid, $connection2, '/modules/Policies/policies_manage.p
 
     $table->addActionColumn()
         ->addParam('policiesPolicyID')
-        ->addParam('search')
+        ->addParam('search', $search)
         ->format(function ($policies, $actions) use ($guid) {
             $actions->addAction('edit', __('Edit'))
             ->setURL('/modules/Policies/policies_manage_edit.php');
