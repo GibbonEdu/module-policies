@@ -40,7 +40,7 @@ if (isActionAccessible($guid, $connection2, '/modules/Policies/policies_manage.p
 
     $form = Form::create('search', $session->get('absoluteURL').'/index.php', 'get');
     $form->setTitle(__('Search'));
-    $form->setClass('noIntBorder fullWidth');
+    $form->setClass('noIntBorder w-full');
 
     $form->addHiddenValue('q', '/modules/'.$session->get('module').'/policies_manage.php');
 

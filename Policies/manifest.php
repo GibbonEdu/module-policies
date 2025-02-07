@@ -27,7 +27,7 @@ $description = 'A place to store, share and view school policies, either as file
 $entryURL = 'policies_view.php';
 $type = 'Additional';
 $category = 'Other';
-$version = '2.2.02';
+$version = '2.3.00';
 $author = "Gibbon Foundation";
 $url = "https://gibbonedu.org";
 
