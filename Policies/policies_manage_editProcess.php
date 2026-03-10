@@ -1,5 +1,4 @@
 <?php
-
 /*
   Gibbon, Flexible & Open School System
   Copyright (C) 2010, Ross Parker
@@ -19,6 +18,7 @@
  */
 
 use Gibbon\Module\Policies\PoliciesGateway;
+use Gibbon\Contracts\Filesystem\FileHandler;
 
 include '../../gibbon.php';
 
@@ -70,9 +70,11 @@ if (isActionAccessible($guid, $connection2, '/modules/Policies/policies_manage_e
             $URL = $URL . '&return=error3';
             header("Location: {$URL}");
         } else {
+            $partialFail = false;
 
             if (!empty($_FILES['file']['tmp_name'])) {
                 $fileUploader = new Gibbon\FileUploader($pdo, $session);
+                $fileMetaData = null;
 
                 $file = (isset($_FILES['file'])) ? $_FILES['file'] : null;
 
@@ -84,6 +86,8 @@ if (isActionAccessible($guid, $connection2, '/modules/Policies/policies_manage_e
                     $URL = $URL . '&return=error5';
                     header("Location: {$URL}");
                     exit;
+                } else {
+                    $fileMetaData = $fileUploader->getFileMetaData($location);
                 }
             }
 
@@ -96,6 +100,20 @@ if (isActionAccessible($guid, $connection2, '/modules/Policies/policies_manage_e
                 $URL = $URL . '&return=error2';
                 header("Location: {$URL}");
                 exit();
+            }
+
+            // AFTER database UPDATE, check if file was removed
+            if (empty($location) && !empty($policy['location'])) {
+                $deleted = $container->get(FileHandler::class)->deleteFile('policiesPolicy', $policiesPolicyID, 'location');
+            }
+
+            // Record file tracking
+            if (!empty($fileMetaData) && !empty($policiesPolicyID)) {
+                $gibbonFileID = $container->get(FileHandler::class)->recordFileUpload($fileMetaData, 'policiesPolicy', $policiesPolicyID, 'location');
+
+                if (empty($gibbonFileID)) {
+                    $partialFail = true;
+                }
             }
 
             //Success 0

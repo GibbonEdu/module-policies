@@ -20,6 +20,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
 use Gibbon\Module\Policies\PoliciesGateway;
+use Gibbon\Contracts\Filesystem\FileHandler;
 
 include '../../gibbon.php';
 
@@ -79,6 +80,7 @@ if (isActionAccessible($guid, $connection2, '/modules/Policies/policies_manage_a
                 //Move attached image  file, if there is one
                 if (!empty($_FILES['file']['tmp_name'])) {
                     $fileUploader = new Gibbon\FileUploader($pdo, $session);
+                    $fileMetaData = null;
 
                     $file = (isset($_FILES['file']))? $_FILES['file'] : null;
 
@@ -89,6 +91,8 @@ if (isActionAccessible($guid, $connection2, '/modules/Policies/policies_manage_a
                         //Fail 5
                         $URL = $URL.'&return=error5';
                         header("Location: {$URL}");
+                    } else {
+                        $fileMetaData = $fileUploader->getFileMetaData($location);
                     }
                 }
                 else {
@@ -119,6 +123,14 @@ if (isActionAccessible($guid, $connection2, '/modules/Policies/policies_manage_a
 
             $AI = str_pad($connection2->lastInsertID(), 8, '0', STR_PAD_LEFT);
 
+            // Record file tracking
+            if (!empty($fileMetaData) && !empty($AI)) {
+                $gibbonFileID = $container->get(FileHandler::class)->recordFileUpload($fileMetaData, 'policiesPolicy', $AI, 'location');
+                if (empty($gibbonFileID)) {
+                    $partialFail = true;
+                }
+            }
+            
             //Success 0
             $URL = $URL.'&return=success0&policiesPolicyID='.$AI;
             header("Location: {$URL}");
