@@ -88,6 +88,9 @@ if (isActionAccessible($guid, $connection2, '/modules/Policies/policies_manage_e
                     exit;
                 } else {
                     $fileMetaData = $fileUploader->getFileMetaData($location);
+                    if (!empty($fileMetaData) && !empty($policy['location'])) {
+                        $fileMetaData['previousFilePath'] = $policy['location'];
+                    }
                 }
             }
 

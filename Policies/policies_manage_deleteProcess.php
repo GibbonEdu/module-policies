@@ -18,6 +18,7 @@ GNU General Public License for more details.
 You should have received a copy of the GNU General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
+use Gibbon\Contracts\Filesystem\FileHandler;
 use Gibbon\Module\Policies\PoliciesGateway;
 
 include '../../gibbon.php';
@@ -50,6 +51,9 @@ if (isActionAccessible($guid, $connection2, '/modules/Policies/policies_manage_d
             //Write to database
             $data = array('policiesPolicyID' => $policiesPolicyID);
             $policies->deletePolicy($data);
+
+            $fileDeleted = $container->get(FileHandler::class)->deleteFile('policiesPolicy', $policiesPolicyID, 'location');
+            
             //Success 0
             $URLDelete = $URLDelete.'&return=success0';
             header("Location: {$URLDelete}");
